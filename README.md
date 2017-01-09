@@ -30,3 +30,4 @@ On first run (`vagrant up`) the base `bento/ubuntu` image will be downloaded, an
 ## Info
 
 * The standard username and password is `vagrant/vagrant`.
+* The icon for the project is ic8.link/391 & Ubuntu_logo.svg provided by Wikiedia.
