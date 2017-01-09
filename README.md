@@ -17,11 +17,11 @@ vagrant --name=myenvironment --desktop=lubuntu --full=true up
 The parameters are used in the calling of `vagrant up`, primarily as `vagrant <options> up`.
 
 * `--name=myenvironment` - The name of the desktop environment
-* `--desktop=lubuntu` - The desktop environment
-* `--type=full` - The type of recommendations to include in the desktop environment
+* `--desktop=[ubuntu|lubuntu]` - The desktop environment
+* `--type=[minimal|full]` - The type of recommendations to include in the desktop environment
 * `--timezone=` - The timezone information *eg Europe/London, etc*
 
-It is based on `bento/ubuntu` images.
+It is based on `bento/ubuntu` images.  If the timezone is not set it will be auto-detected using the [`tzupdate`](https://github.com/cdown/tzupdate).
 
 ## Setting up the application 
 
