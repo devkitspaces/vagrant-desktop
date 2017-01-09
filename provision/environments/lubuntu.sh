@@ -8,7 +8,8 @@
 #   DESCRIPTION: A boostrap script for the LUbuntu desktop environment
 #                See http://lubuntu.net/
 #
-#       OPTIONS:  ENV[DESKTOP_TYPE]
+#       OPTIONS:  DESKTOP_TYPE
+#                   The type of desktop [minimal|full]
 #  REQUIREMENTS:  ---
 #         NOTES:  The environment variable DESKTOP_TYPE should be set to either
 #                  'minimal' or 'full'.
