@@ -1,10 +1,16 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 require 'getoptlong'
+require 'yaml'
+
+Vagrant.require_version ">= 1.6.0"
+VAGRANTFILE_API_VERSION = "2"
 
 ## Default variables
 dir = Dir.pwd
 vagrant_dir = File.expand_path(File.dirname(__FILE__))
+
+SETTINGS_FILE = File.join(vagrant_dir, 'settings.yaml')
 
 # Options
 #
@@ -43,30 +49,44 @@ opts = GetoptLong.new(
 #
 # The options and variables used in the vagrant <options> up call.
 
-name='vagrant-desktop'
-desktop="ubuntu"
-type='minimal'
+settings = {}
+if File.file?(SETTINGS_FILE)
+  settings = YAML.load_file(SETTINGS_FILE)
+end
+
 opts.each do |opt, arg|
   case opt
     when '--name'
-      name=arg.gsub(/[^[:print:]]/i, '')
+      settings['VM_NAME'] =arg.gsub(/[^[:print:]]/i, '')
     when '--desktop'
-      desktop=arg
+      settings['VM_DESKTOP']=arg
     when '--type'
-      type=arg
+      settings['VM_TYPE']=arg
   end
 end
 
-# Vagrantfile API/syntax version.
-VAGRANTFILE_API_VERSION = "2"
+settings['VM_NAME'] = settings['VM_NAME'] || 'vagrant-desktop'
+settings['VM_DESKTOP']  = settings['VM_DESKTOP'] || 'ubuntu'
+settings['VM_TYPE'] = settings['VM_TYPE'] || 'minimal'
+
+# Write to configuration file
+File.open(SETTINGS_FILE, 'w') { |f| YAML.dump(settings, f) }
+
+# Vagrant Definition
+#
+# The definition of the vagrant environment
+
+# Vagrantfile API/
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.env.enable
 
   # Configuration
   #
   # Configuration options for the Vagrant environment.
   config.vm.box = "bento/ubuntu-16.04"
-  config.vm.hostname = "#{name}"
+  config.vm.hostname = settings['VM_NAME']
   config.ssh.forward_agent = true
+  config.vm.synced_folder "../", "/local", :mount_options => ["dmode=777", "fmode=666"]
 
   # Virtualbox configuration
   #
@@ -74,14 +94,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provider :virtualbox do |vb|
     vb.gui = true
 
-    vb.name = "#{name}"
+    vb.name = settings['VM_NAME']
     vb.memory = "2048"
+    vb.customize ["modifyvm", :id, "--vram", "32"]
   end
   
   # Provisioning
   #
   # Process provisioning scripts depending on the existence of custom files.
-  puts "#{name} is #{desktop} environment (recommends=#{type})"
+  config.vm.provision "shell", inline: "echo #{settings['VM_NAME']} is #{settings['VM_DESKTOP']} environment with [recommends=#{settings['VM_TYPE']}]"
   
   # provison-pre.sh
   #
@@ -98,22 +119,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # The environments directories provide provisioning scripts for supported desktop environments.
   # Each script is passed arguments relevant to the desktop provisioning.  The scripts also make use
   # of environment variables initialized with arguments passed to vagrant.
-  case desktop
+  case settings['VM_DESKTOP']
       when 'ubuntu'
-          config.vm.provision :shell, :path => File.join( "provision", "environments", "ubuntu.sh" ), :args => "'#{type}'"
+          config.vm.provision :shell, :path => File.join( "provision", "environments", "ubuntu.sh" ), :args => "'#{settings['VM_TYPE']}'"
       when 'lubuntu'
-          config.vm.provision :shell, :path => File.join( "provision", "environments", "lubuntu.sh" ), :args => "'#{type}'"
+          config.vm.provision :shell, :path => File.join( "provision", "environments", "lubuntu.sh" ), :args => "'#{settings['VM_TYPE']}'"
   else
-      puts "#{desktop} not yet defined"
+      puts "#{settings['VM_DESKTOP']} not yet defined"
   end
-
-  # Reboot after installation
-  config.vm.provision :shell, inline: "reboot"
 
   # provision.sh or provision-custom.sh
   #
   # By default, our Vagrantfile is set to use the provision.sh bash script located in the
-  # provision directory. The provision.sh bash script provisions the desktop environment.
+  # provision directory. The provision.sh bash script provisions the development environment.
   # If it is detected that a provision-custom.sh script has been created, it is run as a replacement. 
   if File.exists?(File.join(vagrant_dir,'provision','provision.sh')) then
     config.vm.provision :shell, :path => File.join( "provision", "provision.sh" )
@@ -121,10 +139,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # provision-post.sh
   #
-  # provision-post.sh acts as a post-hook to the desktop environment provisioning. Anything that should
-  # run after the shell commands laid out in provision.sh or provision-custom.sh should be
-  # put into this file. This provides the method to install packages related to development.
+  # provision-post.sh acts as a post-hook to the provisioning. Anything that should
+  # run after the shell commands laid out in  provisioning should be put into this file.
   if File.exists?(File.join(vagrant_dir,'provision','provision-post.sh')) then
     config.vm.provision :shell, :path => File.join( "provision", "provision-post.sh" )
   end
+
+  # Reboot after installation
+  config.vm.provision :shell, inline: "reboot"
+  config.vm.provision "shell", inline: "echo #{settings['VM_NAME']} is #{settings['VM_DESKTOP']} environment with [recommends=#{settings['VM_TYPE']}]"
 end

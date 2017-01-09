@@ -33,7 +33,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get -y update && apt-get -y upgrade && apt-get -y autoremove
 
 echo "-----------------------------"
-apt-get install -y virtualbox-guest-utils virtualbox-guest-x11 virtualbox-guest-dkms
+#apt-get install -y virtualbox-guest-utils virtualbox-guest-x11 virtualbox-guest-dkms
 
 echo "-----------------------------"
 echo "Setting timezone..."

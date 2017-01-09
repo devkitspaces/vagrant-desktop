@@ -46,3 +46,5 @@ doc/
 .ruby-gemset
 .ruby-version
 .rvmrc
+*.yml
+*.yaml
