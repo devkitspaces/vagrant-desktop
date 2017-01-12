@@ -86,7 +86,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "bento/ubuntu-16.04"
   config.vm.hostname = settings['VM_NAME']
   config.ssh.forward_agent = true
-  config.vm.synced_folder "../", "/local", :mount_options => ["dmode=777", "fmode=666"]
+  config.vm.synced_folder "../", "/local"
 
   # Virtualbox configuration
   #
