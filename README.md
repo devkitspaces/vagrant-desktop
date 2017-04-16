@@ -1,27 +1,42 @@
-![](./docs/icon.png)
-Vagrant Linux Desktop
-=
+# Vagrant Linux Desktop
+[![License][license-badge]][license-link]
 
-### Abstract
+---
+
+## Summary
 
 Provide a method of reproducible graphical development environments based on Linux.  This repositroy provides a base Linux Desktop environment, sandboxed on their local computer.  
 
 ## Usage
 
+You can use this locally with `vagrant up`, calling as such:
+
 ```
-vagrant --name=myenvironment --desktop=lubuntu --full=true up
+vagrant --name=mydesktop --desktop=lubuntu up
+```
+
+It is recommended to use the script `start.sh` to ensure all arguments are provided in their proper form.  You can do so by calling:
+
+```
+./start.sh -n mydesktop -d lubuntu
+```
+
+If you want more information about the script `start.sh`, you can do so by calling:
+
+```
+./start.sh -h
 ```
 
 ## Parameters
 
-The parameters are used in the calling of `vagrant up`, primarily as `vagrant <options> up`.
+The parameters are used in the calling of `vagrant up`, primarily as `vagrant <options> up`.  After provisioning the environment, a settings file (`setting.yaml`) is created, which the provided parameters.
 
-* `--name=myenvironment` - The name of the desktop environment
-* `--desktop=[ubuntu|lubuntu]` - The desktop environment
-* `--type=[minimal|full]` - The type of recommendations to include in the desktop environment
-* `--timezone=` - The timezone information *eg Europe/London, etc*
+| Name | Type | Description |
+| ---  | ---  | ---         |
+| name | string | Name of the provisioned desktop environment |
+| desktop | filename | The name of the desktop provisioning script.  These scripts are present in `provision/environments`. |
 
-It is based on `bento/ubuntu` images.  If the timezone is not set it will be auto-detected using the [`tzupdate`](https://github.com/cdown/tzupdate).
+It is based on `bento/ubuntu` images.  If the timezone is not set, the provision script will attempt to auto-detect the timezone using the [`tzupdate`](https://github.com/cdown/tzupdate).
 
 ## Dependencies 
 
@@ -34,7 +49,5 @@ The following are the dependencies of the vagrant project
 
 On first run (`vagrant up`) the base `bento/ubuntu` image will be downloaded, and the environments will be created.  
 
-## Info
-
-* The standard username and password is `vagrant/vagrant`.
-* The icon for the project is ic8.link/391 & Ubuntu_logo.svg provided by Wikiedia.
+[license-badge]: https://img.shields.io/badge/license-MIT-blue.svg?maxAge=2592000
+[license-link]: LICENSE

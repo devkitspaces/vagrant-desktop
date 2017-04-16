@@ -3,19 +3,19 @@
 require 'getoptlong'
 require 'yaml'
 
+# Variables
+#
+# Variables used in the Vagrantfile.
+
 Vagrant.require_version ">= 1.6.0"
 VAGRANTFILE_API_VERSION = "2"
-
-## Default variables
 dir = Dir.pwd
 vagrant_dir = File.expand_path(File.dirname(__FILE__))
-
 SETTINGS_FILE = File.join(vagrant_dir, 'settings.yaml')
 
-# Options
+# Parameters
 #
-# Options for vagrant 
-
+# Command line parameters of the Vagrantfile.
 opts = GetoptLong.new(
   # Native vagrant options
      [ '--force', '-f', GetoptLong::NO_ARGUMENT ],
@@ -41,42 +41,39 @@ opts = GetoptLong.new(
 
     # Custom options
      [ '--name', GetoptLong::REQUIRED_ARGUMENT ],
-     [ '--desktop', GetoptLong::OPTIONAL_ARGUMENT ],
-     [ '--type', GetoptLong::OPTIONAL_ARGUMENT ]
+     [ '--desktop', GetoptLong::OPTIONAL_ARGUMENT ]
 )
 
-# Vagrant Options
+# Settings
 #
 # The options and variables used in the vagrant <options> up call.
 
+# Load options
 settings = {}
 if File.file?(SETTINGS_FILE)
   settings = YAML.load_file(SETTINGS_FILE)
 end
 
+# Parse options
 opts.each do |opt, arg|
   case opt
     when '--name'
-      settings['VM_NAME'] =arg.gsub(/[^[:print:]]/i, '')
+      settings['VM_NAME']=arg.gsub(/[^[:print:]]/i, '')
     when '--desktop'
       settings['VM_DESKTOP']=arg
-    when '--type'
-      settings['VM_TYPE']=arg
   end
 end
 
+# Set defaults and save
 settings['VM_NAME'] = settings['VM_NAME'] || 'vagrant-desktop'
 settings['VM_DESKTOP']  = settings['VM_DESKTOP'] || 'ubuntu'
-settings['VM_TYPE'] = settings['VM_TYPE'] || 'minimal'
-
-# Write to configuration file
 File.open(SETTINGS_FILE, 'w') { |f| YAML.dump(settings, f) }
 
-# Vagrant Definition
+# Definition
 #
 # The definition of the vagrant environment
 
-# Vagrantfile API/
+# Vagrantfile API
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.env.enable
 
@@ -102,7 +99,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Provisioning
   #
   # Process provisioning scripts depending on the existence of custom files.
-  config.vm.provision "shell", inline: "echo #{settings['VM_NAME']} is #{settings['VM_DESKTOP']} environment with [recommends=#{settings['VM_TYPE']}]"
+  config.vm.provision "shell", inline: "echo #{settings['VM_NAME']} is #{settings['VM_DESKTOP']} environment"
   
   # provison-pre.sh
   #
@@ -112,6 +109,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.provision :shell, :path => File.join( "provision", "provision-pre.sh" )
   end
 
+  # prepare.sh
+  #
+  # prepare.sh prepares the environment for provisioning by setting up essential components.
   config.vm.provision :shell, :path => File.join( "provision", "prepare.sh" )
 
   # environments
@@ -119,14 +119,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # The environments directories provide provisioning scripts for supported desktop environments.
   # Each script is passed arguments relevant to the desktop provisioning.  The scripts also make use
   # of environment variables initialized with arguments passed to vagrant.
-  case settings['VM_DESKTOP']
-      when 'ubuntu'
-          config.vm.provision :shell, :path => File.join( "provision", "environments", "ubuntu.sh" ), :args => "'#{settings['VM_TYPE']}'"
-      when 'lubuntu'
-          config.vm.provision :shell, :path => File.join( "provision", "environments", "lubuntu.sh" ), :args => "'#{settings['VM_TYPE']}'"
-  else
-      puts "#{settings['VM_DESKTOP']} not yet defined"
-  end
+  config.vm.provision :shell, :path => File.join( "provision", "environments", "#{settings['VM_DESKTOP']}.sh" )
 
   # provision.sh or provision-custom.sh
   #
@@ -147,5 +140,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Reboot after installation
   config.vm.provision :shell, inline: "reboot"
-  config.vm.provision "shell", inline: "echo #{settings['VM_NAME']} is #{settings['VM_DESKTOP']} environment with [recommends=#{settings['VM_TYPE']}]"
+  config.vm.provision :shell, inline: "echo #{settings['VM_NAME']} is #{settings['VM_DESKTOP']} environment"
 end
