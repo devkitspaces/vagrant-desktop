@@ -2,6 +2,7 @@
 [![License][license-badge]][license-link]
 [![Image][image-badge]][image-link]
 [![Vagrant][vagrant-badge]][vagrant-link]
+
 ---
 
 ## Summary
@@ -34,8 +35,8 @@ The parameters are used in the calling of `vagrant up`, primarily as `vagrant <o
 
 | Name | Type | Description |
 | ---  | ---  | ---         |
-| name | string | Name of the provisioned desktop environment |
-| desktop | filename | The name of the desktop provisioning script.  These scripts are present in [`provision/environments`](src/provision/environments). |
+| name | `string` | Name of the provisioned desktop environment |
+| desktop | `filename` | The name of the desktop provisioning script.  These scripts are present in [`provision/environments`](src/provision/environments). |
 
 The vagrant environment is based on the `bento/ubuntu` images.  If the timezone is not set, the provision script will attempt to auto-detect the timezone using the [`tzupdate`](https://github.com/cdown/tzupdate).
 
