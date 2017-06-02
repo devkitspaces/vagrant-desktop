@@ -13,6 +13,7 @@
 #        AUTHOR:  jrbeverly
 #
 #==============================================================================
+set -e
 
 # Variables
 #
@@ -20,7 +21,7 @@
 NAME=""
 DESKTOP=""
 
-environment_dir="provision/environments"
+environment_dir="packaging/environments"
 script_match=false
 
 # Options
@@ -51,21 +52,24 @@ if [[ -z "$DESKTOP" ]]; then
     exit 1
 fi
 
-for file in $environment_dir/*; do
-  filename=${file##*/}
-  name=$(echo $filename | cut -f 1 -d '.')
-  if [ $DESKTOP = $name ]; then
-    script_match=true
-    break
-  fi
-done
-
-if [ "$script_match" = false ] ; then
+DESKTOP_SCRIPT="$environment_dir/$DESKTOP.sh"
+if [ ! -f "$DESKTOP_SCRIPT" ]
+then
     echo "The argument '-d DESKTOP' does not match any of the environments available in 'environments/'."
     exit 1
 fi
 
-# Provision
 #
-# Starts and provisions the vagrant environment.
+# Vagrant
+#
+
+echo "Preparing the environment, this will take a while."
 vagrant --name=$NAME --desktop=$DESKTOP up
+sleep 10
+
+echo "Shutdowning the newly created environment"
+vagrant halt
+sleep 5
+
+echo "The environment is ready!"
+vagrant up
