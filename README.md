@@ -5,11 +5,15 @@
 
 ---
 
+ * [Summary](#summary)
+ * [Components](#components)
+ * [Development](#development)
+
 ## Summary
 
 Provide a method of reproducible graphical development environments based on Linux.  This repositroy provides a base Linux Desktop environment, sandboxed on their local computer.  
 
-## Usage
+### Usage
 
 You can use this locally with `vagrant up`, calling as such:
 
@@ -36,13 +40,13 @@ The parameters are used in the calling of `vagrant up`, primarily as `vagrant [O
 | Name | Type | Description |
 | ---  | ---  | ---         |
 | name | `string` | Name of the provisioned desktop environment |
-| desktop | `filename` | The name of the desktop provisioning script.  These scripts are present in [`provision/environments`](src/provision/environments). |
+| desktop | `filename` | The name of the desktop provisioning script.  These scripts are present in [`provision/environments`](src/packaging/environments). |
 
 The vagrant environment is based on the `bento/ubuntu` images.  If the timezone is not set, the provision script will attempt to auto-detect the timezone using [`tzupdate`](https://github.com/cdown/tzupdate).
 
-## Setting up the application 
+## Components
 
-On first run (`vagrant up`) the base `bento/ubuntu` image will be downloaded, and the environments will be created.  The default user is `vagrant` with password `vagrant`.
+On first run (`start.sh ...`) the base `bento/ubuntu` image will be downloaded, and the packages for a graphical interface will be downloaded. This will take a fair amount of time depending on whether a minimal environment is chosen or if the full desktop environment is installed.  The default user is `vagrant` with password `vagrant`.
 
 ### Architecture
 
