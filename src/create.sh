@@ -51,7 +51,7 @@ if [[ -z "$DESKTOP" ]]; then
     exit 1
 fi
 
-DESKTOP_SCRIPT="DIR_ENVIRONMENT/$DESKTOP.sh"
+DESKTOP_SCRIPT="$DIR_ENVIRONMENT/$DESKTOP.sh"
 if [ ! -f "$DESKTOP_SCRIPT" ]
 then
     echo "The argument '-d DESKTOP' does not match any of the environments available in 'environments/'."
