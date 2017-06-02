@@ -48,3 +48,4 @@ doc/
 .rvmrc
 *.yml
 *.yaml
+src/.vagrant/

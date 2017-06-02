@@ -3,19 +3,21 @@
 require 'getoptlong'
 require 'yaml'
 
+# ---------------------------------------
+# Header
+# ---------------------------------------
+Vagrant.require_version ">= 1.6.0"
+
+#
 # Variables
 #
-# Variables used in the Vagrantfile.
-
-Vagrant.require_version ">= 1.6.0"
 VAGRANTFILE_API_VERSION = "2"
-dir = Dir.pwd
-vagrant_dir = File.expand_path(File.dirname(__FILE__))
-SETTINGS_FILE = File.join(vagrant_dir, 'settings.yaml')
+VAGRANT_DIR = File.expand_path(File.dirname(__FILE__))
+SETTINGS_FILE = File.join(VAGRANT_DIR, 'settings.yaml')
 
+# 
 # Parameters
-#
-# Command line parameters of the Vagrantfile.
+# 
 opts = GetoptLong.new(
   # Native vagrant options
      [ '--force', '-f', GetoptLong::NO_ARGUMENT ],
@@ -44,17 +46,15 @@ opts = GetoptLong.new(
      [ '--desktop', GetoptLong::OPTIONAL_ARGUMENT ]
 )
 
+# 
 # Settings
-#
-# The options and variables used in the vagrant <options> up call.
+# 
 
-# Load options
 settings = {}
 if File.file?(SETTINGS_FILE)
   settings = YAML.load_file(SETTINGS_FILE)
 end
 
-# Parse options
 opts.each do |opt, arg|
   case opt
     when '--name'
@@ -64,81 +64,88 @@ opts.each do |opt, arg|
   end
 end
 
-# Set defaults and save
 settings['VM_NAME'] = settings['VM_NAME'] || 'vagrant-desktop'
 settings['VM_DESKTOP']  = settings['VM_DESKTOP'] || 'ubuntu'
 File.open(SETTINGS_FILE, 'w') { |f| YAML.dump(settings, f) }
 
+# ---------------------------------------
 # Definition
-#
-# The definition of the vagrant environment
+# ---------------------------------------
 
-# Vagrantfile API
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.env.enable
 
+  # 
   # Configuration
   #
-  # Configuration options for the Vagrant environment.
   config.vm.box = "bento/ubuntu-16.04"
   config.vm.hostname = settings['VM_NAME']
   config.ssh.forward_agent = true
-  config.vm.synced_folder "../", "/local"
 
+  #
+  # Shared Folders
+  #
+  config.vm.synced_folder "../", "/opt/vagrant"
+  config.vm.synced_folder "../../", "/home/vagrant/repositories"
+
+  # 
   # Virtualbox configuration
   #
-  # The configuration for the Virtualbox provider.
   config.vm.provider :virtualbox do |vb|
     vb.gui = true
 
     vb.name = settings['VM_NAME']
-    vb.memory = "2048"
-    vb.customize ["modifyvm", :id, "--vram", "32"]
+
+    vb.customize ["modifyvm", :id, "--cpus", "2"]
+    vb.customize ["modifyvm", :id, "--memory", "2048"]
+    vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
+    vb.customize ["modifyvm", :id, "--vram", "128"]
+
+    vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
+    vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
+    vb.customize ["modifyvm", :id, "--ioapic", "on"]
   end
-  
+
+  # Prevent TTY Errors (copied from laravel/homestead: "homestead.rb" file)... By default this is "bash -l".
+  config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
+
+  # ---------------------------------------
   # Provisioning
-  #
-  # Process provisioning scripts depending on the existence of custom files.
+  # ---------------------------------------
   config.vm.provision "shell", inline: "echo #{settings['VM_NAME']} is #{settings['VM_DESKTOP']} environment"
   
   # provison-pre.sh
   #
-  # provison-pre.sh acts as a pre-hook to the default provisioning script. Anything that
-  # should run before the shell commands laid out in provision.sh should go in this script. 
-  if File.exists?(File.join(vagrant_dir,'provision','provision-pre.sh')) then
+  # provison-pre.sh acts as a pre-hook to the default provisioning script.
+  if File.exists?(File.join(VAGRANT_DIR,'provision','provision-pre.sh')) then
     config.vm.provision :shell, :path => File.join( "provision", "provision-pre.sh" )
   end
 
   # prepare.sh
   #
-  # prepare.sh prepares the environment for provisioning by setting up essential components.
-  config.vm.provision :shell, :path => File.join( "provision", "prepare.sh" )
+  # prepare.sh prepares the desktop machine for provisioning by setting up essential components.
+  config.vm.provision :shell, :path => File.join( "packaging", "prepare.sh" )
 
   # environments
   #
-  # The environments directories provide provisioning scripts for supported desktop environments.
-  # Each script is passed arguments relevant to the desktop provisioning.  The scripts also make use
-  # of environment variables initialized with arguments passed to vagrant.
-  config.vm.provision :shell, :path => File.join( "provision", "environments", "#{settings['VM_DESKTOP']}.sh" )
+  # The environments scripts provision a desktop environment based on the provided `VM_DESKTOP` parameter.
+  config.vm.provision :shell, :path => File.join( "packaging", "environments", "#{settings['VM_DESKTOP']}.sh" )
 
   # provision.sh or provision-custom.sh
   #
-  # By default, our Vagrantfile is set to use the provision.sh bash script located in the
-  # provision directory. The provision.sh bash script provisions the development environment.
-  # If it is detected that a provision-custom.sh script has been created, it is run as a replacement. 
-  if File.exists?(File.join(vagrant_dir,'provision','provision.sh')) then
+  # prepare.sh provisions the environment.
+  if File.exists?(File.join(VAGRANT_DIR,'provision','provision.sh')) then
     config.vm.provision :shell, :path => File.join( "provision", "provision.sh" )
   end
 
   # provision-post.sh
   #
-  # provision-post.sh acts as a post-hook to the provisioning. Anything that should
-  # run after the shell commands laid out in  provisioning should be put into this file.
-  if File.exists?(File.join(vagrant_dir,'provision','provision-post.sh')) then
+  # provison-pre.sh acts as a post-hook to the default provisioning script.
+  if File.exists?(File.join(VAGRANT_DIR,'provision','provision-post.sh')) then
     config.vm.provision :shell, :path => File.join( "provision", "provision-post.sh" )
   end
 
-  # Reboot after installation
-  config.vm.provision :shell, inline: "reboot"
-  config.vm.provision :shell, inline: "echo #{settings['VM_NAME']} is #{settings['VM_DESKTOP']} environment"
+  # Shutdown after provision   
+  # 
+  config.vm.provision :shell, inline: "echo \"\nThe #{settings['VM_NAME']} is ready!\nCall vagrant-up to start the environment.\n \n\""
 end

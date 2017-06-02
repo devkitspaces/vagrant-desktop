@@ -1,9 +1,10 @@
 #!/bin/bash
 start="$(date +%s)"
+echo "Provisioning Desktop Environment"
 echo "-----------------------------"
 
 apt-get -y install --install-recommends lubuntu-desktop 
 
 end="$(date +%s)"
 echo "-----------------------------"
-echo "Provisioning of ubuntu desktop complete in "$(expr $end - $start)" seconds"
+echo "Provisioning complete in $(($end - $start)) seconds"

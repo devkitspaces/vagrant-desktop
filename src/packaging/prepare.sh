@@ -14,7 +14,6 @@
 #        AUTHOR:  jrbeverly
 #
 #==============================================================================
-
 start="$(date +%s)"
 
 echo "-----------------------------"
@@ -31,9 +30,6 @@ echo "-----------------------------"
 echo "Updating..."
 export DEBIAN_FRONTEND=noninteractive
 apt-get -y update && apt-get -y upgrade && apt-get -y autoremove
-
-echo "-----------------------------"
-#apt-get install -y virtualbox-guest-utils virtualbox-guest-x11 virtualbox-guest-dkms
 
 echo "-----------------------------"
 echo "Setting timezone..."
@@ -54,4 +50,4 @@ echo LC_CTYPE=en_US.UTF-8 >> /etc/environment
 
 end="$(date +%s)"
 echo "-----------------------------"
-echo "Preparing the environment for provisioning completed in "$(expr $end - $start)" seconds"
+echo "Preparing the environment for provisioning completed in $(($end - $start)) seconds"
