@@ -1,11 +1,11 @@
 #!/bin/bash
 #=============================================================================
 #
-#          FILE:  start.sh
+#          FILE:  create.sh
 #
-#         USAGE:  ./start.sh
+#         USAGE:  ./create.sh
 #
-#   DESCRIPTION: Starts the vagrant environment with provided arguments.
+#   DESCRIPTION: Constructs the vagrant environment with provided arguments.
 #
 #       OPTIONS:  ---
 #  REQUIREMENTS:  ---
@@ -18,11 +18,10 @@ set -e
 # Variables
 #
 # Variables used when starting up the vagrant environment.
+DIR_ENVIRONMENT="packaging/environments"
+
 NAME=""
 DESKTOP=""
-
-environment_dir="packaging/environments"
-script_match=false
 
 # Options
 #
@@ -52,7 +51,7 @@ if [[ -z "$DESKTOP" ]]; then
     exit 1
 fi
 
-DESKTOP_SCRIPT="$environment_dir/$DESKTOP.sh"
+DESKTOP_SCRIPT="$DIR_ENVIRONMENT/$DESKTOP.sh"
 if [ ! -f "$DESKTOP_SCRIPT" ]
 then
     echo "The argument '-d DESKTOP' does not match any of the environments available in 'environments/'."
