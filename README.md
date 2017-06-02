@@ -1,7 +1,7 @@
 # Vagrant Linux Desktop
+[![Vagrant][vagrant-badge]][vagrant-link]
 [![License][license-badge]][license-link]
 [![Image][image-badge]][image-link]
-[![Vagrant][vagrant-badge]][vagrant-link]
 
 ---
 
@@ -20,26 +20,25 @@ vagrant --name=mydesktop up
 However It is recommended to use the script `create.sh` for the first run to ensure all necessary arguments are provided. The provided arguments enable the creation of a `settings.yaml`.  You can create the environment by calling:
 
 ```
-sh create.sh -n mydesktop -d lubuntu
+sh create.sh -n mydesktop -d ubuntu
 ```
 
 If you want more information about the script `create.sh`, you can do so by calling:
 
 ```
-sh start.sh -h
+sh create.sh -h
 ```
 
 ### Parameters
 
-The parameters are used in the calling of `vagrant up`, primarily as `vagrant <options> up`.  After provisioning the environment, a settings file (`setting.yaml`) is created, which stores the provided parameters.
+The parameters are used in the calling of `vagrant up`, primarily as `vagrant [OPTIONS] up`.  After provisioning the environment, a settings file (`setting.yaml`) is created, which stores the provided parameters.
 
 | Name | Type | Description |
 | ---  | ---  | ---         |
 | name | `string` | Name of the provisioned desktop environment |
 | desktop | `filename` | The name of the desktop provisioning script.  These scripts are present in [`provision/environments`](src/provision/environments). |
 
-The vagrant environment is based on the `bento/ubuntu` images.  If the timezone is not set, the provision script will attempt to auto-detect the timezone using the [`tzupdate`](https://github.com/cdown/tzupdate).
-
+The vagrant environment is based on the `bento/ubuntu` images.  If the timezone is not set, the provision script will attempt to auto-detect the timezone using [`tzupdate`](https://github.com/cdown/tzupdate).
 
 ## Setting up the application 
 
@@ -100,5 +99,5 @@ The following are the dependencies of the vagrant project
 [image-badge]: https://img.shields.io/badge/box-bento/ubuntu-red.svg?maxAge=2592000
 [image-link]: https://atlas.hashicorp.com/bento/boxes/ubuntu-16.10
 
-[vagrant-badge]: https://img.shields.io/badge/vagrant-2-green.svg?maxAge=2592000
+[vagrant-badge]: https://img.shields.io/badge/vagrant.api-2-green.svg?maxAge=2592000
 [vagrant-link]: src/Vagrantfile
