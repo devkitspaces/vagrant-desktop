@@ -62,7 +62,7 @@ echo "Preparing the environment, this will take a while."
 vagrant --name=$name --desktop=$desktop up
 sleep 10
 
-echo "Restarting the newly created environment to ensure everything is worked alright"
+echo "Restarting the newly created environment."
 vagrant halt
 sleep 5
 
