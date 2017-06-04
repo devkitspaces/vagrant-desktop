@@ -19,7 +19,7 @@ SETTINGS_FILE = File.join(VAGRANT_DIR, 'settings.yaml')
 # Parameters
 # 
 opts = GetoptLong.new(
-  # Native vagrant options
+    # Native vagrant options
      [ '--force', '-f', GetoptLong::NO_ARGUMENT ],
      [ '--provision', '-p', GetoptLong::NO_ARGUMENT ],
      [ '--provision-with', GetoptLong::NO_ARGUMENT ],
@@ -73,7 +73,6 @@ File.open(SETTINGS_FILE, 'w') { |f| YAML.dump(settings, f) }
 # ---------------------------------------
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.env.enable
 
   # 
   # Configuration
@@ -86,7 +85,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Shared Folders
   #
   config.vm.synced_folder "../", "/opt/vagrant"
-  config.vm.synced_folder "../../", "/home/vagrant/repositories"
+  config.vm.synced_folder "../../../", "/home/vagrant/repositories"
 
   # 
   # Virtualbox configuration
@@ -123,7 +122,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # prepare.sh
   #
-  # prepare.sh prepares the desktop machine for provisioning by setting up essential components.
+  # prepare.sh prepares the desktop environment for provisioning by setting up essential components.
   config.vm.provision :shell, :path => File.join( "packaging", "prepare.sh" )
 
   # environments
@@ -131,7 +130,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # The environments scripts provision a desktop environment based on the provided `VM_DESKTOP` parameter.
   config.vm.provision :shell, :path => File.join( "packaging", "environments", "#{settings['VM_DESKTOP']}.sh" )
 
-  # provision.sh or provision-custom.sh
+  # provision.sh
   #
   # prepare.sh provisions the environment.
   if File.exists?(File.join(VAGRANT_DIR,'provision','provision.sh')) then
@@ -145,7 +144,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.provision :shell, :path => File.join( "provision", "provision-post.sh" )
   end
 
-  # Shutdown after provision   
+  #
+  # End of Provision
   # 
-  config.vm.provision :shell, inline: "echo \"\nThe #{settings['VM_NAME']} is ready!\nCall vagrant-up to start the environment.\n \n\""
+  config.vm.provision :shell, inline: "echo \"\n \nThe #{settings['VM_NAME']} is ready!\nYou should reboot the environment to ensure everything is in working order.\n \n \n\""
 end

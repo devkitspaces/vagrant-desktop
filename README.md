@@ -61,7 +61,8 @@ The `vagrant-desktop` is meant to be included as a git submodule as part of a `.
     * Repositories
         * MySourceCode (git repo submodule)
         * MyLibCode (git repo submodule)
-    * vagrant-desktop (git repo submodule)
+    * Environments
+        * vagrant-desktop (git repo submodule)
     README.md
 ```
 
@@ -73,10 +74,10 @@ Essential tasks like pushing/pulling from the repository can be handled on the h
 
 The `Vagrantfile` makes use of the following shared folders to access files on the host machine.
 
-| Name | Path |  Host Path | Description |
+| Name | Path |  Host Path (relative to `Vagrantfile`) | Description |
 | --- | --- | --- | --- |
 | Repository | /srv/local | ../ | The `vagrant-desktop` repository root. |
-| Repositories | /home/vagrant/repositories | ../../ | The parent directory of the `vagrant-desktop` repository. See [Architecture](#architecture). |
+| Repositories | /home/vagrant/repositories | ../../../ | The parent directory of the `vagrant-desktop` repository. See [Architecture](#architecture). |
 
 ## Development
 
