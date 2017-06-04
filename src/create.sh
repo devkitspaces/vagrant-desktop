@@ -1,69 +1,62 @@
 #!/bin/bash
 #=============================================================================
-#
-#          FILE:  create.sh
-#
-#         USAGE:  ./create.sh
-#
-#   DESCRIPTION: Constructs the vagrant environment with provided arguments.
-#
-#       OPTIONS:  ---
-#  REQUIREMENTS:  ---
-#         NOTES:  ---
-#        AUTHOR:  jrbeverly
-#
-#==============================================================================
+# Constructs the vagrant environment with provided arguments.
+#=============================================================================
 set -e
 
+# 
 # Variables
-#
-# Variables used when starting up the vagrant environment.
-DIR_ENVIRONMENT="packaging/environments"
+# 
+SCRIPT=$(readlink -f "$0")
+DIR="$(dirname $SCRIPT)"
+ROOT_DIR="$(dirname $DIR)"
+ENVIRONMENT_DIR="${DIR}/packaging/environments"
 
-NAME=""
-DESKTOP=""
+name=""
+desktop=""
 
+# 
 # Options
 #
-# Parses the options provided to the script.
 while getopts "h?:n:d:" opt; do
     case $opt in
         h|\?)
-            echo "Usage: $0 -n NAME -d DESKTOP"
+            echo "Usage: $0 -n name -d desktop"
             echo
             echo "Starts the vagrant environment with provided arguments." 
             exit 0
         ;;
-        n) NAME=$OPTARG
+        n) name=$OPTARG
         ;;
-        d) DESKTOP=$OPTARG
+        d) desktop=$OPTARG
         ;;
     esac
 done
 
-if [[ -z "$NAME" ]]; then
-    echo "The argument '-n NAME' was not provided."
+if [[ -z "$name" ]]; then
+    echo "The argument '-n name' was not provided."
     exit 1
 fi
 
-if [[ -z "$DESKTOP" ]]; then
-    echo "The argument '-d DESKTOP' was not provided."
+if [[ -z "$desktop" ]]; then
+    echo "The argument '-d desktop' was not provided."
     exit 1
 fi
 
-DESKTOP_SCRIPT="$DIR_ENVIRONMENT/$DESKTOP.sh"
+DESKTOP_SCRIPT="$ENVIRONMENT_DIR/$desktop.sh"
 if [ ! -f "$DESKTOP_SCRIPT" ]
 then
-    echo "The argument '-d DESKTOP' does not match any of the environments available in 'environments/'."
+    echo "The argument '-d $desktop' does not match any of the environments available in 'environments/'."
     exit 1
 fi
 
 #
 # Vagrant
 #
+cd $DIR
 
 echo "Preparing the environment, this will take a while."
-vagrant --name=$NAME --desktop=$DESKTOP up
+vagrant --name=$name --desktop=$desktop up
 sleep 10
 
 echo "Shutdowning the newly created environment"

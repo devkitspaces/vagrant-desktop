@@ -86,7 +86,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Shared Folders
   #
   config.vm.synced_folder "../", "/opt/vagrant"
-  config.vm.synced_folder "../../", "/home/vagrant/repositories"
+  config.vm.synced_folder "../../../", "/home/vagrant/repositories"
 
   # 
   # Virtualbox configuration
@@ -147,5 +147,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Shutdown after provision   
   # 
-  config.vm.provision :shell, inline: "echo \"\nThe #{settings['VM_NAME']} is ready!\nCall vagrant-up to start the environment.\n \n\""
+  config.vm.provision :shell, inline: "echo \"\n \nThe #{settings['VM_NAME']} is ready!\nYou should reboot the environment to ensure everything is in working order.\n \n \n\""
 end

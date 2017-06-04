@@ -1,5 +1,7 @@
 #!/bin/bash
 start="$(date +%s)"
+logfile=/vagrant/vagrant-$start.log
+
 echo "Provisioning Environment"
 echo "-----------------------------"
 
@@ -7,4 +9,4 @@ echo "-----------------------------"
 
 end="$(date +%s)"
 echo "-----------------------------"
-echo "Provisioning complete in "$(expr $end - $start)" seconds"
+echo "The provisioning step completed in "$(expr $end - $start)" seconds"
