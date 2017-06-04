@@ -12,11 +12,14 @@ DIR="$(dirname $SCRIPT)"
 ROOT_DIR="$(dirname $DIR)"
 ENVIRONMENT_DIR="${DIR}/packaging/environments"
 
+#
+# Options
+#
 name=""
 desktop=""
 
 # 
-# Options
+# Option Parsing
 #
 while getopts "h?:n:d:" opt; do
     case $opt in
@@ -59,7 +62,7 @@ echo "Preparing the environment, this will take a while."
 vagrant --name=$name --desktop=$desktop up
 sleep 10
 
-echo "Shutdowning the newly created environment"
+echo "Restarting the newly created environment to ensure everything is worked alright"
 vagrant halt
 sleep 5
 

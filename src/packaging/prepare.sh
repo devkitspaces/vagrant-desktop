@@ -40,7 +40,10 @@ if [[ -z "${DESKTOP_TZ}" ]]; then
     pip install -U tzupdate >>$logfile 2>&1
     tzupdate >>$logfile 2>&1
 else
-    if [ $(grep -c UTC /etc/timezone) -gt 0 ]; then echo "${DESKTOP_TZ}" | sudo tee /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata; fi
+    if [ $(grep -c UTC /etc/timezone) -gt 0 ]; then 
+        echo "${DESKTOP_TZ}" | tee /etc/timezone 
+        dpkg-reconfigure --frontend noninteractive tzdata >>$logfile 2>&1; 
+    fi
 fi
 
 echo "-----------------------------"
