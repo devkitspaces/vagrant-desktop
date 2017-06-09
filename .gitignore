@@ -28,7 +28,6 @@ vendor/
 # Documentation
 _site/*
 .yardoc/
-doc/
 
 # Python
 *.pyc
@@ -52,3 +51,6 @@ doc/
 *.yaml
 src/.vagrant/
 *.log
+
+# Other
+doc/images/
