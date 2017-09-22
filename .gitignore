@@ -1,21 +1,24 @@
-# OS-specific
-.DS_Store
+## Editors:
+.vscode/
+.idea/*
+*.iml
+.project
 
-# Editor swapfiles
-.*.sw?
-*~
+## Test outputs:
+tests/**/target/
 
-# Vagrant stuff
+## Build outputs:
+bin/
+out/
+
+## Vagrant:
+/.vagrant
+**/.vagrant
+/vagrant-spec.config.rb
 acceptance_config.yml
 boxes/*
-/.vagrant
-/website/.vagrant
-/website/build
-/vagrant-spec.config.rb
-/src/settings.yaml
-/src/.vagrant
 
-# Bundler/Rubygems
+## Bundler/Rubygems
 *.gem
 .bundle
 pkg/*
@@ -25,21 +28,16 @@ test/tmp/
 vendor/
 /exec
 
-# Documentation
+## Documentation:
+docs/**/images/
 _site/*
 .yardoc/
 
-# Python
+## Python:
 *.pyc
 
-# Rubinius
+## Rubinius:
 *.rbc
-
-# IDE junk
-.idea/*
-*.iml
-.project
-.vscode/
 
 # Ruby Managers
 .rbenv
@@ -49,8 +47,4 @@ _site/*
 .rvmrc
 *.yml
 *.yaml
-src/.vagrant/
 *.log
-
-# Other
-doc/images/
