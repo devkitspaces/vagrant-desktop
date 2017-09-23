@@ -39,7 +39,7 @@ _site/*
 ## Rubinius:
 *.rbc
 
-# Ruby Managers
+# Ruby Managers:
 .rbenv
 .rbenv-gemsets
 .ruby-gemset

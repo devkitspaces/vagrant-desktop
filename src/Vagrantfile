@@ -4,16 +4,18 @@ require 'getoptlong'
 require 'yaml'
 
 # ---------------------------------------
+# Plugins
+# ---------------------------------------
+#if !Vagrant.has_plugin?('vagrant-vbguest')
+#  puts 'vagrant-vbguest plugin required. To install simply do `vagrant plugin install vagrant-vbguest`'
+#  abort
+#end
+
+# ---------------------------------------
 # Header
 # ---------------------------------------
 Vagrant.require_version ">= 1.6.0"
-
-#
-# Variables
-#
 VAGRANTFILE_API_VERSION = "2"
-VAGRANT_DIR = File.expand_path(File.dirname(__FILE__))
-SETTINGS_FILE = File.join(VAGRANT_DIR, 'settings.yaml')
 
 # 
 # Parameters
@@ -42,32 +44,48 @@ opts = GetoptLong.new(
      [ '--debug', GetoptLong::NO_ARGUMENT ],
 
     # Custom options
-     [ '--name', GetoptLong::REQUIRED_ARGUMENT ],
-     [ '--desktop', GetoptLong::OPTIONAL_ARGUMENT ]
+     [ '--env-file', GetoptLong::REQUIRED_ARGUMENT ]
 )
+
+envfile = {}
+opts.each do |opt, arg|
+  case opt
+    when '--env-file'
+      envfile=arg
+  end
+end
+
+if envfile.nil? || envfile.empty?
+  puts 'The --env-file argument is required.'
+  puts 
+  puts '  Usage: `vagrant --env-file=desktop.yaml up`'
+  puts
+  abort
+end
 
 # 
 # Settings
 # 
+DIR_VAGRANT = File.expand_path(File.dirname(__FILE__))
+FILE_SETTINGS = File.join(DIR_VAGRANT, envfile)
 
 settings = {}
-if File.file?(SETTINGS_FILE)
-  settings = YAML.load_file(SETTINGS_FILE)
+if !File.file?(FILE_SETTINGS)
+  puts "open #{envfile}: The system cannot find the file specified."
+  puts "  path: #{FILE_SETTINGS}"
+  abort
 end
 
-opts.each do |opt, arg|
-  case opt
-    when '--name'
-      settings['VM_NAME']=arg.gsub(/[^[:print:]]/i, '')
-    when '--desktop'
-      settings['VM_DESKTOP']=arg
-  end
+settings = YAML.load_file(FILE_SETTINGS)
+
+name = settings['name']
+if name.nil? || name.empty?
+  puts 'The `name` property is required in the environment file: #{envfile}.'
+  abort
 end
 
-settings['VM_NAME'] = settings['VM_NAME'] || 'vagrant-desktop'
-settings['VM_DESKTOP']  = settings['VM_DESKTOP'] || 'ubuntu'
-File.open(SETTINGS_FILE, 'w') { |f| YAML.dump(settings, f) }
-
+puts "HERE"
+abort
 # ---------------------------------------
 # Definition
 # ---------------------------------------
@@ -78,7 +96,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Configuration
   #
   config.vm.box = "bento/ubuntu-16.04"
-  config.vm.hostname = settings['VM_NAME']
+  config.vm.hostname = settings['name']
   config.ssh.forward_agent = true
 
   #
@@ -93,7 +111,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provider :virtualbox do |vb|
     vb.gui = true
 
-    vb.name = settings['VM_NAME']
+    vb.name = settings['name']
 
     vb.customize ["modifyvm", :id, "--cpus", "2"]
     vb.customize ["modifyvm", :id, "--memory", "2048"]
@@ -110,42 +128,43 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # ---------------------------------------
   # Provisioning
-  # ---------------------------------------
-  config.vm.provision "shell", inline: "echo #{settings['VM_NAME']} is #{settings['VM_DESKTOP']} environment"
+  # ---------------------------------------  
+  config.vm.provision "shell", inline: "echo #{settings['name']} is #{settings['desktop']} environment"
+  config.vm.provision :shell, :path => File.join( "packaging", "bootstrap.sh" )
   
   # provison-pre.sh
   #
   # provison-pre.sh acts as a pre-hook to the default provisioning script.
-  if File.exists?(File.join(VAGRANT_DIR,'provision','provision-pre.sh')) then
-    config.vm.provision :shell, :path => File.join( "provision", "provision-pre.sh" )
-  end
+  #if File.exists?(File.join(VAGRANT_DIR,'provision','provision-pre.sh')) then
+  #  config.vm.provision :shell, :path => File.join( "provision", "provision-pre.sh" )
+  #end
 
   # prepare.sh
   #
   # prepare.sh prepares the desktop environment for provisioning by setting up essential components.
-  config.vm.provision :shell, :path => File.join( "packaging", "prepare.sh" )
+  #config.vm.provision :shell, :path => File.join( "packaging", "prepare.sh" )
 
   # environments
   #
   # The environments scripts provision a desktop environment based on the provided `VM_DESKTOP` parameter.
-  config.vm.provision :shell, :path => File.join( "packaging", "environments", "#{settings['VM_DESKTOP']}.sh" )
+  #config.vm.provision :shell, :path => File.join( "packaging", "environments", "#{settings['VM_DESKTOP']}.sh" )
 
   # provision.sh
   #
   # prepare.sh provisions the environment.
-  if File.exists?(File.join(VAGRANT_DIR,'provision','provision.sh')) then
-    config.vm.provision :shell, :path => File.join( "provision", "provision.sh" )
-  end
+  #if File.exists?(File.join(VAGRANT_DIR,'provision','provision.sh')) then
+  #  config.vm.provision :shell, :path => File.join( "provision", "provision.sh" )
+  #end
 
   # provision-post.sh
   #
   # provison-pre.sh acts as a post-hook to the default provisioning script.
-  if File.exists?(File.join(VAGRANT_DIR,'provision','provision-post.sh')) then
-    config.vm.provision :shell, :path => File.join( "provision", "provision-post.sh" )
-  end
+  #if File.exists?(File.join(VAGRANT_DIR,'provision','provision-post.sh')) then
+  #  config.vm.provision :shell, :path => File.join( "provision", "provision-post.sh" )
+  #end
 
   #
   # End of Provision
   # 
-  config.vm.provision :shell, inline: "echo \"\n \nThe #{settings['VM_NAME']} is ready!\nYou should reboot the environment to ensure everything is in working order.\n \n \n\""
+  config.vm.provision :shell, inline: "echo \"\n \nThe #{settings['name']} is ready!\nYou should reboot the environment to ensure everything is in working order.\n \n \n\""
 end
