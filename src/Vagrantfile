@@ -67,20 +67,21 @@ end
 # Settings
 # 
 DIR_VAGRANT = File.expand_path(File.dirname(__FILE__))
-FILE_SETTINGS = File.join(DIR_VAGRANT, envfile)
-
+env_filename = File.baseimage(envfile);
+puts "reading environment file: #{env_filename}"
 settings = {}
-if !File.file?(FILE_SETTINGS)
+if !File.file?(envfile)
   puts "open #{envfile}: The system cannot find the file specified."
-  puts "  path: #{FILE_SETTINGS}"
+  puts "  path: #{envfile}"
   abort
 end
 
-settings = YAML.load_file(FILE_SETTINGS)
+
+settings = YAML.load_file(envfile)
 
 name = settings['name']
 if name.nil? || name.empty?
-  puts 'The `name` property is required in the environment file: #{envfile}.'
+  puts 'The `name` property is required in the environment file: #{env_filename}.'
   abort
 end
 
@@ -104,6 +105,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #
   config.vm.synced_folder "../", "/opt/vagrant"
   config.vm.synced_folder "../../../", "/home/vagrant/repositories"
+  config.vm.provision "file", source: "#{envfile}", destination: "/tmp/envfile"
 
   # 
   # Virtualbox configuration
@@ -125,7 +127,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Prevent TTY Errors (copied from laravel/homestead: "homestead.rb" file)... By default this is "bash -l".
   config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
-
+  
   # ---------------------------------------
   # Provisioning
   # ---------------------------------------  
