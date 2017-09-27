@@ -6,10 +6,10 @@ require 'yaml'
 # ---------------------------------------
 # Plugins
 # ---------------------------------------
-#if !Vagrant.has_plugin?('vagrant-vbguest')
-#  puts 'vagrant-vbguest plugin required. To install simply do `vagrant plugin install vagrant-vbguest`'
-#  abort
-#end
+if !Vagrant.has_plugin?('vagrant-vbguest')
+  puts 'vagrant-vbguest plugin required. To install simply do `vagrant plugin install vagrant-vbguest`'
+  exit
+end
 
 # ---------------------------------------
 # Libraries
@@ -57,7 +57,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box = "bento/ubuntu-16.04"
   config.vm.hostname = p_name
-  config.ssh.forward_agent = true  
+  config.ssh.forward_agent=true  
 
   config.vm.synced_folder "../", "/opt/vagrant"
   config.vm.synced_folder "../../../", "/home/vagrant/repositories"
@@ -66,9 +66,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Virtualbox configuration
   #
   config.vm.provider :virtualbox do |vb|
-      vb.gui = true
+      vb.gui=true
 
-      vb.name = settings['name']
+      vb.name = p_name
 
       vb.customize ["modifyvm", :id, "--cpus", "2"]
       vb.customize ["modifyvm", :id, "--memory", "2048"]

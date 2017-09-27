@@ -24,30 +24,30 @@ end
 def read_options()
     opts = GetoptLong.new(
         # Native vagrant options
-         [ '--force', '-f', GetoptLong::NO_ARGUMENT ],
-         [ '--provision', '-p', GetoptLong::NO_ARGUMENT ],
-         [ '--provision-with', GetoptLong::NO_ARGUMENT ],
-         [ '--provider', GetoptLong::OPTIONAL_ARGUMENT ],
-         [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
-         [ '--check', GetoptLong::NO_ARGUMENT ],
-         [ '--logout', GetoptLong::NO_ARGUMENT ],
-         [ '--token', GetoptLong::NO_ARGUMENT ],
-         [ '--disable-http', GetoptLong::NO_ARGUMENT ],
-         [ '--http', GetoptLong::NO_ARGUMENT ],
-         [ '--https', GetoptLong::NO_ARGUMENT ],
-         [ '--ssh-no-password', GetoptLong::NO_ARGUMENT ],
-         [ '--ssh', GetoptLong::NO_ARGUMENT ],
-         [ '--ssh-port', GetoptLong::NO_ARGUMENT ],
-         [ '--ssh-once', GetoptLong::NO_ARGUMENT ],
-         [ '--host', GetoptLong::NO_ARGUMENT ],
-         [ '--entry-point', GetoptLong::NO_ARGUMENT ],
-         [ '--plugin-source', GetoptLong::NO_ARGUMENT ],
-         [ '--plugin-version', GetoptLong::NO_ARGUMENT ],
-         [ '--debug', GetoptLong::NO_ARGUMENT ],
-    
+        [ '--force', '-f', GetoptLong::NO_ARGUMENT ],
+        [ '--provision', '-p', GetoptLong::NO_ARGUMENT ],
+        [ '--provision-with', GetoptLong::NO_ARGUMENT ],
+        [ '--provider', GetoptLong::OPTIONAL_ARGUMENT ],
+        [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+        [ '--check', GetoptLong::NO_ARGUMENT ],
+        [ '--logout', GetoptLong::NO_ARGUMENT ],
+        [ '--token', GetoptLong::NO_ARGUMENT ],
+        [ '--disable-http', GetoptLong::NO_ARGUMENT ],
+        [ '--http', GetoptLong::NO_ARGUMENT ],
+        [ '--https', GetoptLong::NO_ARGUMENT ],
+        [ '--ssh-no-password', GetoptLong::NO_ARGUMENT ],
+        [ '--ssh', GetoptLong::NO_ARGUMENT ],
+        [ '--ssh-port', GetoptLong::NO_ARGUMENT ],
+        [ '--ssh-once', GetoptLong::NO_ARGUMENT ],
+        [ '--host', GetoptLong::NO_ARGUMENT ],
+        [ '--entry-point', GetoptLong::NO_ARGUMENT ],
+        [ '--plugin-source', GetoptLong::NO_ARGUMENT ],
+        [ '--plugin-version', GetoptLong::NO_ARGUMENT ],
+        [ '--debug', GetoptLong::NO_ARGUMENT ],
+
         # Vagrant desktop options
-         [ "--name", GetoptLong::REQUIRED_ARGUMENT ],
-         [ "--env-file", GetoptLong::REQUIRED_ARGUMENT ]
+        [ "--name", GetoptLong::REQUIRED_ARGUMENT ],
+        [ "--env-file", GetoptLong::REQUIRED_ARGUMENT ]
     )
 
     params = {}
