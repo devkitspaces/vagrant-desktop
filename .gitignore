@@ -18,7 +18,7 @@ out/
 acceptance_config.yml
 boxes/*
 
-## Bundler/Rubygems
+## Bundler/Rubygems:
 *.gem
 .bundle
 pkg/*
