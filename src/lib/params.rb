@@ -1,0 +1,74 @@
+#!/usr/bin/ruby
+require 'getoptlong'
+
+# ---------------------------------------
+# Utility Functions
+# ---------------------------------------
+
+# Print the customized usage of `vagrant up`.
+def print_usage()
+    puts 'vagrant [options] up'
+    puts
+    puts 'Options:'
+    puts '* --name      The name assigned to the virtual machine.'
+    puts '* --env-file      The name assigned to the virtual machine.'
+    puts
+    puts 'Options marked with * are required.'
+end
+
+# ---------------------------------------
+# Option Functions
+# ---------------------------------------
+
+# Reads the console options for `vagrant up`.
+def read_options()
+    opts = GetoptLong.new(
+        # Native vagrant options
+         [ '--force', '-f', GetoptLong::NO_ARGUMENT ],
+         [ '--provision', '-p', GetoptLong::NO_ARGUMENT ],
+         [ '--provision-with', GetoptLong::NO_ARGUMENT ],
+         [ '--provider', GetoptLong::OPTIONAL_ARGUMENT ],
+         [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+         [ '--check', GetoptLong::NO_ARGUMENT ],
+         [ '--logout', GetoptLong::NO_ARGUMENT ],
+         [ '--token', GetoptLong::NO_ARGUMENT ],
+         [ '--disable-http', GetoptLong::NO_ARGUMENT ],
+         [ '--http', GetoptLong::NO_ARGUMENT ],
+         [ '--https', GetoptLong::NO_ARGUMENT ],
+         [ '--ssh-no-password', GetoptLong::NO_ARGUMENT ],
+         [ '--ssh', GetoptLong::NO_ARGUMENT ],
+         [ '--ssh-port', GetoptLong::NO_ARGUMENT ],
+         [ '--ssh-once', GetoptLong::NO_ARGUMENT ],
+         [ '--host', GetoptLong::NO_ARGUMENT ],
+         [ '--entry-point', GetoptLong::NO_ARGUMENT ],
+         [ '--plugin-source', GetoptLong::NO_ARGUMENT ],
+         [ '--plugin-version', GetoptLong::NO_ARGUMENT ],
+         [ '--debug', GetoptLong::NO_ARGUMENT ],
+    
+        # Vagrant desktop options
+         [ "--name", GetoptLong::REQUIRED_ARGUMENT ],
+         [ "--env-file", GetoptLong::REQUIRED_ARGUMENT ]
+    )
+
+    params = {}
+    opts.each do |opt, arg|
+        case opt
+          when '--env-file'
+            params['env-file']=arg
+          when '--name'
+            params['name']=arg
+        end
+    end
+
+    return params
+end
+
+# Requires the definition of an argument or ceases execution.
+def require_arg(name, arg)
+    if arg.nil? || arg.empty?
+        puts 'The "--#{name}" argument is required.'
+        puts 
+        print_usage()
+        exit
+    end
+end

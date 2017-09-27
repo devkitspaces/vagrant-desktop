@@ -12,117 +12,72 @@ require 'yaml'
 #end
 
 # ---------------------------------------
+# Libraries
+# ---------------------------------------
+root_dir = File.dirname(__FILE__)
+lib_dir = 'lib'
+lib_path = "#{root_dir}/#{lib_dir}"
+
+if File.exist?( lib_path )
+  lib_files = Dir.glob( "#{lib_path}/*.rb") 
+  lib_files && lib_files.each do |files|
+    require_relative "#{lib_dir}/#{File.basename( files, '.rb' )}"
+  end
+end
+
+# ---------------------------------------
 # Header
 # ---------------------------------------
 Vagrant.require_version ">= 1.6.0"
 VAGRANTFILE_API_VERSION = "2"
 
-# 
+# ---------------------------------------
 # Parameters
-# 
-opts = GetoptLong.new(
-    # Native vagrant options
-     [ '--force', '-f', GetoptLong::NO_ARGUMENT ],
-     [ '--provision', '-p', GetoptLong::NO_ARGUMENT ],
-     [ '--provision-with', GetoptLong::NO_ARGUMENT ],
-     [ '--provider', GetoptLong::OPTIONAL_ARGUMENT ],
-     [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
-     [ '--check', GetoptLong::NO_ARGUMENT ],
-     [ '--logout', GetoptLong::NO_ARGUMENT ],
-     [ '--token', GetoptLong::NO_ARGUMENT ],
-     [ '--disable-http', GetoptLong::NO_ARGUMENT ],
-     [ '--http', GetoptLong::NO_ARGUMENT ],
-     [ '--https', GetoptLong::NO_ARGUMENT ],
-     [ '--ssh-no-password', GetoptLong::NO_ARGUMENT ],
-     [ '--ssh', GetoptLong::NO_ARGUMENT ],
-     [ '--ssh-port', GetoptLong::NO_ARGUMENT ],
-     [ '--ssh-once', GetoptLong::NO_ARGUMENT ],
-     [ '--host', GetoptLong::NO_ARGUMENT ],
-     [ '--entry-point', GetoptLong::NO_ARGUMENT ],
-     [ '--plugin-source', GetoptLong::NO_ARGUMENT ],
-     [ '--plugin-version', GetoptLong::NO_ARGUMENT ],
-     [ '--debug', GetoptLong::NO_ARGUMENT ],
+# ---------------------------------------
+params = read_options()
 
-    # Custom options
-     [ '--env-file', GetoptLong::REQUIRED_ARGUMENT ]
-)
+require_arg("name", params['name'])
+require_arg("env-file", params['env-file'])
 
-envfile = {}
-opts.each do |opt, arg|
-  case opt
-    when '--env-file'
-      envfile=arg
-  end
-end
+p_name=params['name']
+p_envfile=params['env-file']
 
-if envfile.nil? || envfile.empty?
-  puts 'The --env-file argument is required.'
-  puts 
-  puts '  Usage: `vagrant --env-file=desktop.yaml up`'
-  puts
-  abort
-end
-
-# 
+# ---------------------------------------
 # Settings
-# 
-DIR_VAGRANT = File.expand_path(File.dirname(__FILE__))
-env_filename = File.baseimage(envfile);
-puts "reading environment file: #{env_filename}"
-settings = {}
-if !File.file?(envfile)
-  puts "open #{envfile}: The system cannot find the file specified."
-  puts "  path: #{envfile}"
-  abort
-end
+# ---------------------------------------
+envfile = File.expand_path(p_envfile)
+puts "using definition file: #{envfile}"
+settings = read_settings(envfile)
 
-
-settings = YAML.load_file(envfile)
-
-name = settings['name']
-if name.nil? || name.empty?
-  puts 'The `name` property is required in the environment file: #{env_filename}.'
-  abort
-end
-
-puts "HERE"
-abort
 # ---------------------------------------
 # Definition
 # ---------------------------------------
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  # 
-  # Configuration
-  #
   config.vm.box = "bento/ubuntu-16.04"
-  config.vm.hostname = settings['name']
-  config.ssh.forward_agent = true
+  config.vm.hostname = p_name
+  config.ssh.forward_agent = true  
 
-  #
-  # Shared Folders
-  #
   config.vm.synced_folder "../", "/opt/vagrant"
   config.vm.synced_folder "../../../", "/home/vagrant/repositories"
-  config.vm.provision "file", source: "#{envfile}", destination: "/tmp/envfile"
 
   # 
   # Virtualbox configuration
   #
   config.vm.provider :virtualbox do |vb|
-    vb.gui = true
+      vb.gui = true
 
-    vb.name = settings['name']
+      vb.name = settings['name']
 
-    vb.customize ["modifyvm", :id, "--cpus", "2"]
-    vb.customize ["modifyvm", :id, "--memory", "2048"]
-    vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
-    vb.customize ["modifyvm", :id, "--vram", "128"]
+      vb.customize ["modifyvm", :id, "--cpus", "2"]
+      vb.customize ["modifyvm", :id, "--memory", "2048"]
+      vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
+      vb.customize ["modifyvm", :id, "--vram", "128"]
 
-    vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
-    vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
-    vb.customize ["modifyvm", :id, "--ioapic", "on"]
+      vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
+      vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
+      vb.customize ["modifyvm", :id, "--ioapic", "on"]
   end
 
   # Prevent TTY Errors (copied from laravel/homestead: "homestead.rb" file)... By default this is "bash -l".
@@ -131,8 +86,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # ---------------------------------------
   # Provisioning
   # ---------------------------------------  
-  config.vm.provision "shell", inline: "echo #{settings['name']} is #{settings['desktop']} environment"
-  config.vm.provision :shell, :path => File.join( "packaging", "bootstrap.sh" )
+  config.vm.provision :shell, :path => File.join( "packaging", "prepare.sh" )
   
   # provison-pre.sh
   #
@@ -168,5 +122,4 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #
   # End of Provision
   # 
-  config.vm.provision :shell, inline: "echo \"\n \nThe #{settings['name']} is ready!\nYou should reboot the environment to ensure everything is in working order.\n \n \n\""
 end
