@@ -8,7 +8,7 @@ def vm_info(config, name)
     config.vm.box = "bento/ubuntu-16.04"
     config.vm.hostname = name
     config.ssh.forward_agent = true  
-  end
+end
 
 def vm_synced_folders(config)
     config.vm.synced_folder "../", "/opt/vagrant"

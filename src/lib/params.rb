@@ -5,23 +5,25 @@ require 'getoptlong'
 # Utility Functions
 # ---------------------------------------
 
-# Print the customized usage of `vagrant up`.
+##
+# Print the required usage of vagrant up
 def print_usage()
-    puts 'vagrant [options] up'
+    puts 'vagrant [options] <command>'
     puts
     puts 'Options:'
-    puts '* --name      The name assigned to the virtual machine.'
-    puts '* --env-file      The name assigned to the virtual machine.'
-    puts
-    puts 'Options marked with * are required.'
+    puts ' --name      The name assigned to the virtual machine.'
+    puts ' --file      The definition file for the virtual machine.'
 end
 
 # ---------------------------------------
 # Option Functions
 # ---------------------------------------
 
-# Reads the console options for `vagrant up`.
-def read_options()
+##
+# Parses the command line options into a dictionary
+# Returns: 
+# A dictionary of parameters
+def parse_options()
     opts = GetoptLong.new(
         # Native vagrant options
         [ '--force', '-f', GetoptLong::NO_ARGUMENT ],
@@ -47,14 +49,14 @@ def read_options()
 
         # Vagrant desktop options
         [ "--name", GetoptLong::REQUIRED_ARGUMENT ],
-        [ "--env-file", GetoptLong::REQUIRED_ARGUMENT ]
+        [ "--file", GetoptLong::REQUIRED_ARGUMENT ]
     )
 
     params = {}
     opts.each do |opt, arg|
         case opt
-          when '--env-file'
-            params['env-file']=arg
+          when '--file'
+            params['file']=arg
           when '--name'
             params['name']=arg
         end
@@ -63,10 +65,18 @@ def read_options()
     return params
 end
 
-# Requires the definition of an argument or ceases execution.
-def require_arg(name, arg)
-    if arg.nil? || arg.empty?
-        puts 'The "--#{name}" argument is required.'
+##
+# Requires a command line option to be set to a value, otherwise abort.
+# Params:
+# +name+:: The name of the command line option
+# +value+:: The value of the command line option
+#
+# The application will terminate if the argument is null or empty.
+#
+def require_arg(name, value)
+    if value.nil? || value.empty?
+        arg=name
+        puts "Missing argument: The '--#{name}' argument is required."
         puts 
         print_usage()
         exit

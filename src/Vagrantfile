@@ -30,34 +30,38 @@ end
 # ---------------------------------------
 Vagrant.require_version ">= 1.6.0"
 VAGRANTFILE_API_VERSION = "2"
+VAGRANTFILE_LOG_PATH = "/opt/vagrant/provision.log"
 
 # ---------------------------------------
 # Parameters
 # ---------------------------------------
-params = read_options()
+params = parse_options()
 
 require_arg("name", params['name'])
-require_arg("env-file", params['env-file'])
+require_arg("env-file", params['file'])
 
 p_name=params['name']
-p_envfile=params['env-file']
+p_file=params['file']
 
 # ---------------------------------------
 # Settings
 # ---------------------------------------
-envfile = File.expand_path(p_envfile)
-puts "using definition file: #{envfile}"
-settings = read_settings(envfile)
+deffile = File.expand_path(p_file)
+puts "using definition file: #{deffile}"
+settings = read_settings(deffile)
+validate_settings(settings)
 
 # ---------------------------------------
 # Definition
 # ---------------------------------------
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  VAGRANT_DOTFILE_PATH = settings['path']
 
-  config.vm.box = "bento/ubuntu-16.04"
-  config.vm.hostname = p_name
+  config.vm.box = settings['box']
+  config.vm.hostname = settings['name']
   config.ssh.forward_agent=true  
+  
 
   config.vm.synced_folder "../", "/opt/vagrant"
   config.vm.synced_folder "../../../", "/home/vagrant/repositories"
@@ -86,7 +90,29 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # ---------------------------------------
   # Provisioning
   # ---------------------------------------  
-  config.vm.provision :shell, :path => File.join( "packaging", "prepare.sh" )
+  # bootstrap.sh
+  #
+  # bootstrap.sh prepares the environment for the provisioning process.
+  config.vm.provision :shell do |sh|
+    sh.path = File.join( "provision", "bootstrap.sh" )
+    sh.env = { :VAGRANT_LOG => "#{VAGRANTFILE_LOG_PATH}" }
+  end
+
+  vagrant_copy_run(config, "prepare.sh", "")
+
+  # config.vm.provision :file do |file|
+  #   file.source = File.join( "provision", "prepare.sh" )
+  #   file.destination = "/tmp/prepare.sh"
+  # end
+
+  # # prepare.sh
+  # #
+  # # prepare.sh prepares the desktop environment for provisioning by setting up essential components.
+  # config.vm.provision :shell do |sh|
+  #   sh.path = File.join( "provision", "entrypoint.bash" )
+  #   sh.args = "'/tmp/prepare.sh'"
+  #   sh.env = { :VAGRANT_LOG => "#{VAGRANTFILE_LOG_PATH}" }
+  # end
   
   # provison-pre.sh
   #
@@ -94,11 +120,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #if File.exists?(File.join(VAGRANT_DIR,'provision','provision-pre.sh')) then
   #  config.vm.provision :shell, :path => File.join( "provision", "provision-pre.sh" )
   #end
-
-  # prepare.sh
-  #
-  # prepare.sh prepares the desktop environment for provisioning by setting up essential components.
-  #config.vm.provision :shell, :path => File.join( "packaging", "prepare.sh" )
 
   # environments
   #

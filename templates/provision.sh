@@ -1,6 +1,5 @@
 #!/bin/bash
 start="$(date +%s)"
-logfile=/vagrant/vagrant-$start.log
 
 echo "Provisioning Environment"
 echo "-----------------------------"
