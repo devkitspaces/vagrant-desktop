@@ -38,10 +38,16 @@ def validate_settings(settings)
     
     err = !has_property(settings, 'name') \
         | !has_property(settings, 'box') \
-        | !has_property(settings, 'path')
+        | !has_property(settings, 'path') \
+        | !has_property(settings, 'desktop')
+
+    if ! File.exists?(File.join('env',"#{settings['desktop']}.bash")) then
+        puts "The environment '#{settings['desktop']}' could not be found."
+        err = true
+    end
 
     if err
-        puts "Properties are missing from the settings file."
+        puts "The settings file has errors. Please fix and try to provision again."
         exit
     end
 end

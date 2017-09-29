@@ -98,47 +98,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     sh.env = { :VAGRANT_LOG => "#{VAGRANTFILE_LOG_PATH}" }
   end
 
-  vagrant_copy_run(config, "prepare.sh", "")
-
-  # config.vm.provision :file do |file|
-  #   file.source = File.join( "provision", "prepare.sh" )
-  #   file.destination = "/tmp/prepare.sh"
-  # end
-
-  # # prepare.sh
-  # #
-  # # prepare.sh prepares the desktop environment for provisioning by setting up essential components.
-  # config.vm.provision :shell do |sh|
-  #   sh.path = File.join( "provision", "entrypoint.bash" )
-  #   sh.args = "'/tmp/prepare.sh'"
-  #   sh.env = { :VAGRANT_LOG => "#{VAGRANTFILE_LOG_PATH}" }
-  # end
+  vagrant_copy_run(config, "Setting up essential components", File.join( "provision", "prepare.sh" ), "")
   
-  # provison-pre.sh
-  #
-  # provison-pre.sh acts as a pre-hook to the default provisioning script.
-  #if File.exists?(File.join(VAGRANT_DIR,'provision','provision-pre.sh')) then
-  #  config.vm.provision :shell, :path => File.join( "provision", "provision-pre.sh" )
-  #end
+  if File.exists?(File.join('provision','provision-pre.sh')) then
+    vagrant_copy_run(config, "Running the pre-hook to the default provisioning script",File.join("provision","provision-pre.sh"),"")
+  end
 
-  # environments
-  #
-  # The environments scripts provision a desktop environment based on the provided `VM_DESKTOP` parameter.
-  #config.vm.provision :shell, :path => File.join( "packaging", "environments", "#{settings['VM_DESKTOP']}.sh" )
+  vagrant_copy_run(config,"Setting up the desktop environment",File.join( "env", "#{settings['desktop']}.bash"),"")
 
-  # provision.sh
-  #
-  # prepare.sh provisions the environment.
-  #if File.exists?(File.join(VAGRANT_DIR,'provision','provision.sh')) then
-  #  config.vm.provision :shell, :path => File.join( "provision", "provision.sh" )
-  #end
+  if File.exists?(File.join('provision','provision.sh')) then
+    vagrant_copy_run(config, "Setting up environment specific properties",File.join("provision","provision.sh"),"")
+  end
 
-  # provision-post.sh
-  #
-  # provison-pre.sh acts as a post-hook to the default provisioning script.
-  #if File.exists?(File.join(VAGRANT_DIR,'provision','provision-post.sh')) then
-  #  config.vm.provision :shell, :path => File.join( "provision", "provision-post.sh" )
-  #end
+  if File.exists?(File.join('provision','provision-post.sh')) then
+    vagrant_copy_run(config, "Running the post-hook to the default provisioning script",File.join("provision","provision-post.sh"),"")
+  end
 
   #
   # End of Provision
