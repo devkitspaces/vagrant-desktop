@@ -21,6 +21,7 @@ end
 
 ##
 # Parses the command line options into a dictionary
+#
 # Returns: 
 # A dictionary of parameters
 def parse_options()
@@ -66,12 +67,12 @@ def parse_options()
 end
 
 ##
-# Requires a command line option to be set to a value, otherwise abort.
+# Requires a command line option to be set to a value, otherwise abort
 # Params:
 # +name+:: The name of the command line option
 # +value+:: The value of the command line option
 #
-# The application will terminate if the argument is null or empty.
+# The application will terminate if the argument is null or empty
 #
 def require_arg(name, value)
     if value.nil? || value.empty?

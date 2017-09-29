@@ -1,10 +1,19 @@
 #!/usr/bin/ruby
-require 'getoptlong'
 
 # ---------------------------------------
 # Vagrant Functions
 # ---------------------------------------
 
+##
+# Copies the script to the virtual machine and executes it with the specified arguments.
+# Params:
+# +config+:: The vagrant configuration
+# +message+:: The message to output to the command
+# +filepath+:: The path to the script
+# +args+:: The arguments to pass to the script
+#
+# The method provides a set of environment variables to the script.
+#
 def vagrant_copy_run(config, message, filepath, args)
     filename = File.basename(filepath)
     copy_path = "/tmp/#{filename}"

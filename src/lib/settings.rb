@@ -6,15 +6,17 @@ require 'yaml'
 # ---------------------------------------
 
 ##
-# Requires a command line option to be set to a value, otherwise abort
+# Reads the settings file from the specified path
+# Params:
+# +file+:: The path to the settings file
 #
-# The application will terminate if the line file cannot be found
+# The application will terminate if the file cannot be found
 #
-# Returns: 
+# Returns:
 # A dictionary of settings
-def read_settings(file) 
+def read_settings(file)
     settings = {}
-    
+
     if !File.file?(file)
         puts "open #{file}: The system cannot find the file specified."
         puts "  path: #{file}"
@@ -35,7 +37,7 @@ end
 #
 def validate_settings(settings)
     err=false
-    
+
     err = !has_property(settings, 'name') \
         | !has_property(settings, 'box') \
         | !has_property(settings, 'path') \
@@ -53,14 +55,15 @@ def validate_settings(settings)
 end
 
 ##
-# Validates the settings file for required properties
+# Verifies that the dictionary contains the specified property
 # Params:
 # +settings+:: The settings object
+# +property+:: The name of the property
 #
 # The function will output a message if the property is missing
 #
-# Returns: 
-# True if the key exists, false otherwise.
+# Returns:
+# True if the key exists, false otherwise
 def has_property(settings, property)
     if settings["#{property}"].nil? || settings["#{property}"].empty?
         puts "The property '#{property}' is missing from the settings file."
