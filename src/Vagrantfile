@@ -1,7 +1,10 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+require 'fileutils'
 require 'getoptlong'
 require 'yaml'
+require 'time'
+
 
 # ---------------------------------------
 # Plugins
@@ -30,7 +33,6 @@ end
 # ---------------------------------------
 Vagrant.require_version ">= 1.6.0"
 VAGRANTFILE_API_VERSION = "2"
-VAGRANTFILE_LOG_PATH = "/opt/vagrant/provision.log"
 
 # ---------------------------------------
 # Parameters
@@ -38,7 +40,7 @@ VAGRANTFILE_LOG_PATH = "/opt/vagrant/provision.log"
 params = parse_options()
 
 require_arg("name", params['name'])
-require_arg("env-file", params['file'])
+require_arg("file", params['file'])
 
 p_name=params['name']
 p_file=params['file']
@@ -61,10 +63,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = settings['box']
   config.vm.hostname = settings['name']
   config.ssh.forward_agent=true  
-  
 
-  config.vm.synced_folder "../", "/opt/vagrant"
-  config.vm.synced_folder "../../../", "/home/vagrant/repositories"
+  vm_synced_folders(config, settings)
 
   # 
   # Virtualbox configuration
@@ -86,19 +86,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Prevent TTY Errors (copied from laravel/homestead: "homestead.rb" file)... By default this is "bash -l".
   config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
-  
+  vm_variables(config, settings)
+
   # ---------------------------------------
   # Provisioning
   # ---------------------------------------  
-  # bootstrap.sh
-  #
-  # bootstrap.sh prepares the environment for the provisioning process.
   config.vm.provision :shell do |sh|
     sh.path = File.join( "provision", "bootstrap.sh" )
-    sh.env = { :VAGRANT_LOG => "#{VAGRANTFILE_LOG_PATH}" }
+    sh.env = { }
   end
 
-  vagrant_copy_run(config, "Setting up essential components", File.join( "provision", "prepare.sh" ), "")
+  vagrant_copy_run(config, "Setting up essential components",File.join( "provision", "prepare.sh" ),"")
   
   if File.exists?(File.join('provision','provision-pre.sh')) then
     vagrant_copy_run(config, "Running the pre-hook to the default provisioning script",File.join("provision","provision-pre.sh"),"")
@@ -113,8 +111,4 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   if File.exists?(File.join('provision','provision-post.sh')) then
     vagrant_copy_run(config, "Running the post-hook to the default provisioning script",File.join("provision","provision-post.sh"),"")
   end
-
-  #
-  # End of Provision
-  # 
 end

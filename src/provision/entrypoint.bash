@@ -26,10 +26,11 @@ ARGS="$@"
 # ---------------------------------------
 # Main
 # --------------------------------------- 
+exec 3>&1
 
 printf "\n$MESSAGE\n\n"  | boxes -d html -s $BOX_SIZE
 START_TIME="$(date +%s)"
 export DEBIAN_FRONTEND=noninteractive
-bash "$SCRIPT_PATH" $ARGS
+bash "$SCRIPT_PATH" $ARGS >>$VAGRANT_LOG 2>&1
 END_TIME="$(date +%s)"
 printf "\nThe provision script '$SCRIPT_NAME' has completed\n The script completed within $(($END_TIME - $START_TIME)) seconds\n\n" | boxes -d html -s $BOX_SIZE

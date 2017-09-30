@@ -41,7 +41,9 @@ def validate_settings(settings)
     err = !has_property(settings, 'name') \
         | !has_property(settings, 'box') \
         | !has_property(settings, 'path') \
-        | !has_property(settings, 'desktop')
+        | !has_property(settings, 'desktop') \
+        | !has_property(settings, 'synced_folders') \
+        | !has_property(settings, 'logs')
 
     if ! File.exists?(File.join('env',"#{settings['desktop']}.bash")) then
         puts "The environment '#{settings['desktop']}' could not be found."

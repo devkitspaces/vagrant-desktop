@@ -2,9 +2,8 @@
 #=============================================================================
 # Prepares any dependencies needed for the vagrant provisioning process.
 #=============================================================================
-
 echo "-----------------------------------------------------------"
-echo "Checking for external network connection." 
+echo "Checking for external network connection."
 ONLINE=$(nc -z 8.8.8.8 53  >/dev/null 2>&1)
 if [[ $ONLINE -eq $zero ]]; then 
     echo "External network connection established, updating packages."
