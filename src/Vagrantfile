@@ -5,7 +5,6 @@ require 'getoptlong'
 require 'yaml'
 require 'time'
 
-
 # ---------------------------------------
 # Plugins
 # ---------------------------------------
@@ -49,16 +48,26 @@ p_file=params['file']
 # Settings
 # ---------------------------------------
 deffile = File.expand_path(p_file)
-puts "using definition file: #{deffile}"
 settings = read_settings(deffile)
 validate_settings(settings)
+
+VAGRANT_DOTFILE_PATH = File.expand_path(settings['path']) 
+if(ENV['VAGRANT_DOTFILE_PATH'].nil? && '.vagrant' != VAGRANT_DOTFILE_PATH)
+    ENV['VAGRANT_DOTFILE_PATH'] = VAGRANT_DOTFILE_PATH
+    FileUtils.rm_r('.vagrant')
+
+    system "vagrant --name=#{p_name} --file=#{p_file} " + ARGV.join(' ')
+    ENV['VAGRANT_DOTFILE_PATH'] = nil
+    exit
+end
 
 # ---------------------------------------
 # Definition
 # ---------------------------------------
 
+puts "using definition file: #{deffile}"
+puts "using metadata directory: #{VAGRANT_DOTFILE_PATH}"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  VAGRANT_DOTFILE_PATH = settings['path']
 
   config.vm.box = settings['box']
   config.vm.hostname = settings['name']

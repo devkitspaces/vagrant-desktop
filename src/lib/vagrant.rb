@@ -75,3 +75,23 @@ def vm_variables(config, settings)
     result = profile.string
     config.vm.provision "shell", inline: result
 end
+
+def vm_get_dot_path(variables)
+    dotpath = variables['VAGRANT_DOTFILE_PATH'];
+    if(dotpath.nil?)
+        dotpath = '.vagrant';
+    end
+    return dotpath
+end
+
+def vm_ensure_dot_path(dotfile_path, curpath)
+    if(dotfile_path.nil?)
+        dotfile_path = '.vagrant';
+    end
+
+    if(dotfile_path != curpath)        
+        return dotfile_path
+    end
+
+    return curpath
+end

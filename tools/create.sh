@@ -7,31 +7,30 @@ set -e
 # 
 # Variables
 # 
-SCRIPT=$(readlink -f "$0")
-DIR="$(dirname $SCRIPT)"
-ROOT_DIR="$(dirname $DIR)"
-ENVIRONMENT_DIR="${DIR}/packaging/environments"
+DIR=$(dirname "$(readlink -f "$0")")
+DIR_ROOT="$(dirname $DIR)"
+DIR_SRC="$DIR_ROOT/src"
 
 #
 # Options
 #
 name=""
-desktop=""
+file=""
 
 # 
 # Option Parsing
 #
-while getopts "h?:n:d:" opt; do
+while getopts "h?:n:f:" opt; do
     case $opt in
         h|\?)
-            echo "Usage: $0 -n name -d desktop"
+            echo "Usage: $0 -n name -f file"
             echo
             echo "Starts the vagrant environment with provided arguments." 
             exit 0
         ;;
         n) name=$OPTARG
         ;;
-        d) desktop=$OPTARG
+        f) file=$OPTARG
         ;;
     esac
 done
@@ -41,30 +40,23 @@ if [[ -z "$name" ]]; then
     exit 1
 fi
 
-if [[ -z "$desktop" ]]; then
-    echo "The argument '-d desktop' was not provided."
-    exit 1
-fi
-
-DESKTOP_SCRIPT="$ENVIRONMENT_DIR/$desktop.sh"
-if [ ! -f "$DESKTOP_SCRIPT" ]
-then
-    echo "The argument '-d $desktop' does not match any of the environments available in 'environments/'."
+if [[ -z "$file" ]]; then
+    echo "The argument '-f file' was not provided."
     exit 1
 fi
 
 #
 # Vagrant
 #
-cd $DIR
+cd $DIR_SRC
 
 echo "Preparing the environment, this will take a while."
-vagrant --name=$name --desktop=$desktop up
-sleep 10
+vagrant --name=$name --file=$file up
+#sleep 10
 
-echo "Restarting the newly created environment."
-vagrant halt
-sleep 5
+#echo "Restarting the newly created environment."
+#vagrant halt
+#sleep 5
 
-echo "The environment is ready!"
-vagrant up
+#echo "The environment is ready!"
+#vagrant up
