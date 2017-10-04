@@ -1,151 +1,116 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+require 'fileutils'
 require 'getoptlong'
 require 'yaml'
+require 'time'
+
+# ---------------------------------------
+# Plugins
+# ---------------------------------------
+if !Vagrant.has_plugin?('vagrant-vbguest')
+  puts 'vagrant-vbguest plugin required. To install simply do `vagrant plugin install vagrant-vbguest`'
+  exit
+end
+
+# ---------------------------------------
+# Libraries
+# ---------------------------------------
+root_dir = File.dirname(__FILE__)
+lib_dir = 'lib'
+lib_path = "#{root_dir}/#{lib_dir}"
+
+if File.exist?( lib_path )
+  lib_files = Dir.glob( "#{lib_path}/*.rb") 
+  lib_files && lib_files.each do |files|
+    require_relative "#{lib_dir}/#{File.basename( files, '.rb' )}"
+  end
+end
 
 # ---------------------------------------
 # Header
 # ---------------------------------------
 Vagrant.require_version ">= 1.6.0"
-
-#
-# Variables
-#
 VAGRANTFILE_API_VERSION = "2"
-VAGRANT_DIR = File.expand_path(File.dirname(__FILE__))
-SETTINGS_FILE = File.join(VAGRANT_DIR, 'settings.yaml')
 
-# 
+# ---------------------------------------
 # Parameters
-# 
-opts = GetoptLong.new(
-    # Native vagrant options
-     [ '--force', '-f', GetoptLong::NO_ARGUMENT ],
-     [ '--provision', '-p', GetoptLong::NO_ARGUMENT ],
-     [ '--provision-with', GetoptLong::NO_ARGUMENT ],
-     [ '--provider', GetoptLong::OPTIONAL_ARGUMENT ],
-     [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
-     [ '--check', GetoptLong::NO_ARGUMENT ],
-     [ '--logout', GetoptLong::NO_ARGUMENT ],
-     [ '--token', GetoptLong::NO_ARGUMENT ],
-     [ '--disable-http', GetoptLong::NO_ARGUMENT ],
-     [ '--http', GetoptLong::NO_ARGUMENT ],
-     [ '--https', GetoptLong::NO_ARGUMENT ],
-     [ '--ssh-no-password', GetoptLong::NO_ARGUMENT ],
-     [ '--ssh', GetoptLong::NO_ARGUMENT ],
-     [ '--ssh-port', GetoptLong::NO_ARGUMENT ],
-     [ '--ssh-once', GetoptLong::NO_ARGUMENT ],
-     [ '--host', GetoptLong::NO_ARGUMENT ],
-     [ '--entry-point', GetoptLong::NO_ARGUMENT ],
-     [ '--plugin-source', GetoptLong::NO_ARGUMENT ],
-     [ '--plugin-version', GetoptLong::NO_ARGUMENT ],
-     [ '--debug', GetoptLong::NO_ARGUMENT ],
+# ---------------------------------------
+params = parse_options()
 
-    # Custom options
-     [ '--name', GetoptLong::REQUIRED_ARGUMENT ],
-     [ '--desktop', GetoptLong::OPTIONAL_ARGUMENT ]
-)
+require_arg("name", params['name'])
+require_arg("file", params['file'])
 
-# 
+p_name=params['name']
+p_file=params['file']
+
+# ---------------------------------------
 # Settings
-# 
+# ---------------------------------------
+deffile = File.expand_path(p_file)
+settings = read_settings(deffile)
+validate_settings(settings)
 
-settings = {}
-if File.file?(SETTINGS_FILE)
-  settings = YAML.load_file(SETTINGS_FILE)
-end
-
-opts.each do |opt, arg|
-  case opt
-    when '--name'
-      settings['VM_NAME']=arg.gsub(/[^[:print:]]/i, '')
-    when '--desktop'
-      settings['VM_DESKTOP']=arg
-  end
-end
-
-settings['VM_NAME'] = settings['VM_NAME'] || 'vagrant-desktop'
-settings['VM_DESKTOP']  = settings['VM_DESKTOP'] || 'ubuntu'
-File.open(SETTINGS_FILE, 'w') { |f| YAML.dump(settings, f) }
+VAGRANT_DOTFILE_PATH = File.expand_path(settings['path']) 
+vm_run_with_dot(p_name, p_file, VAGRANT_DOTFILE_PATH)
 
 # ---------------------------------------
 # Definition
 # ---------------------------------------
 
+puts "using definition file: #{deffile}"
+puts "using metadata directory: #{VAGRANT_DOTFILE_PATH}"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  # 
-  # Configuration
-  #
-  config.vm.box = "bento/ubuntu-16.04"
-  config.vm.hostname = settings['VM_NAME']
-  config.ssh.forward_agent = true
+  config.vm.box = settings['box']
+  config.vm.hostname = settings['name']
+  config.ssh.forward_agent=true  
 
-  #
-  # Shared Folders
-  #
-  config.vm.synced_folder "../", "/opt/vagrant"
-  config.vm.synced_folder "../../../", "/home/vagrant/repositories"
+  vm_synced_folders(config, settings)
 
   # 
   # Virtualbox configuration
   #
   config.vm.provider :virtualbox do |vb|
-    vb.gui = true
+      vb.gui=true
 
-    vb.name = settings['VM_NAME']
+      vb.name = p_name
 
-    vb.customize ["modifyvm", :id, "--cpus", "2"]
-    vb.customize ["modifyvm", :id, "--memory", "2048"]
-    vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
-    vb.customize ["modifyvm", :id, "--vram", "128"]
+      vb.customize ["modifyvm", :id, "--cpus", "2"]
+      vb.customize ["modifyvm", :id, "--memory", "2048"]
+      vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
+      vb.customize ["modifyvm", :id, "--vram", "128"]
 
-    vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
-    vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
-    vb.customize ["modifyvm", :id, "--ioapic", "on"]
+      vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
+      vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
+      vb.customize ["modifyvm", :id, "--ioapic", "on"]
   end
 
   # Prevent TTY Errors (copied from laravel/homestead: "homestead.rb" file)... By default this is "bash -l".
   config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
+  vm_variables(config, settings)
 
   # ---------------------------------------
   # Provisioning
-  # ---------------------------------------
-  config.vm.provision "shell", inline: "echo #{settings['VM_NAME']} is #{settings['VM_DESKTOP']} environment"
+  # ---------------------------------------  
+  config.vm.provision :shell do |sh|
+    sh.path = File.join( "provision", "bootstrap.sh" )
+    sh.env = { }
+  end
+
+  vagrant_copy_run(config, "Setting up essential components", File.join( "provision", "prepare.sh" ),"")
   
-  # provison-pre.sh
-  #
-  # provison-pre.sh acts as a pre-hook to the default provisioning script.
-  if File.exists?(File.join(VAGRANT_DIR,'provision','provision-pre.sh')) then
-    config.vm.provision :shell, :path => File.join( "provision", "provision-pre.sh" )
+  if File.exists?(File.join('provision','provision-pre.sh')) then
+    vagrant_copy_run(config, "Running the pre-hook to the default provisioning script", File.join("provision","provision-pre.sh"),"")
   end
 
-  # prepare.sh
-  #
-  # prepare.sh prepares the desktop environment for provisioning by setting up essential components.
-  config.vm.provision :shell, :path => File.join( "packaging", "prepare.sh" )
+  vagrant_copy_run(config,"Setting up the desktop environment", File.join( "env", "#{settings['desktop']}.bash"),"")
 
-  # environments
-  #
-  # The environments scripts provision a desktop environment based on the provided `VM_DESKTOP` parameter.
-  config.vm.provision :shell, :path => File.join( "packaging", "environments", "#{settings['VM_DESKTOP']}.sh" )
-
-  # provision.sh
-  #
-  # prepare.sh provisions the environment.
-  if File.exists?(File.join(VAGRANT_DIR,'provision','provision.sh')) then
-    config.vm.provision :shell, :path => File.join( "provision", "provision.sh" )
+  if File.exists?(File.join('provision','provision.sh')) then
+    vagrant_copy_run(config, "Setting up environment specific properties", File.join("provision","provision.sh"),"")
   end
 
-  # provision-post.sh
-  #
-  # provison-pre.sh acts as a post-hook to the default provisioning script.
-  if File.exists?(File.join(VAGRANT_DIR,'provision','provision-post.sh')) then
-    config.vm.provision :shell, :path => File.join( "provision", "provision-post.sh" )
+  if File.exists?(File.join('provision','provision-post.sh')) then
+    vagrant_copy_run(config, "Running the post-hook to the default provisioning script", File.join("provision","provision-post.sh"),"")
   end
-
-  #
-  # End of Provision
-  # 
-  config.vm.provision :shell, inline: "echo \"\n \nThe #{settings['VM_NAME']} is ready!\nYou should reboot the environment to ensure everything is in working order.\n \n \n\""
 end
