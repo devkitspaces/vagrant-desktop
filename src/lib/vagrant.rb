@@ -13,8 +13,6 @@ require 'stringio'
 # +filepath+:: The path to the script
 # +args+:: The arguments to pass to the script
 #
-# The method provides a set of environment variables to the script.
-#
 def vagrant_copy_run(config, message, filepath, args)
     filename = File.basename(filepath)
     copy_path = "/tmp/#{filename}"
@@ -76,22 +74,22 @@ def vm_variables(config, settings)
     config.vm.provision "shell", inline: result
 end
 
-def vm_get_dot_path(variables)
-    dotpath = variables['VAGRANT_DOTFILE_PATH'];
-    if(dotpath.nil?)
-        dotpath = '.vagrant';
+##
+# Gets the current vagrant dotfile path
+# Params:
+# +name+:: The name of the vagrant box
+# +file+:: The path to the settings file
+# +dotfile_path+:: The path to the vagrant dotfile
+#
+# Returns: 
+# A filepath to the vagrant dotfile
+def vm_run_with_dot(name, file, dotfile_path)
+    if(ENV['VAGRANT_DOTFILE_PATH'].nil? && '.vagrant' != dotfile_path)
+        ENV['VAGRANT_DOTFILE_PATH'] = dotfile_path
+        FileUtils.rm_r('.vagrant')
+    
+        system "vagrant --name=#{name} --file=#{file} " + ARGV.join(' ')
+        ENV['VAGRANT_DOTFILE_PATH'] = nil
+        exit
     end
-    return dotpath
-end
-
-def vm_ensure_dot_path(dotfile_path, curpath)
-    if(dotfile_path.nil?)
-        dotfile_path = '.vagrant';
-    end
-
-    if(dotfile_path != curpath)        
-        return dotfile_path
-    end
-
-    return curpath
 end

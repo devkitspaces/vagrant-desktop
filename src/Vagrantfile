@@ -52,14 +52,7 @@ settings = read_settings(deffile)
 validate_settings(settings)
 
 VAGRANT_DOTFILE_PATH = File.expand_path(settings['path']) 
-if(ENV['VAGRANT_DOTFILE_PATH'].nil? && '.vagrant' != VAGRANT_DOTFILE_PATH)
-    ENV['VAGRANT_DOTFILE_PATH'] = VAGRANT_DOTFILE_PATH
-    FileUtils.rm_r('.vagrant')
-
-    system "vagrant --name=#{p_name} --file=#{p_file} " + ARGV.join(' ')
-    ENV['VAGRANT_DOTFILE_PATH'] = nil
-    exit
-end
+vm_run_with_dot(p_name, p_file, VAGRANT_DOTFILE_PATH)
 
 # ---------------------------------------
 # Definition
@@ -105,19 +98,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     sh.env = { }
   end
 
-  vagrant_copy_run(config, "Setting up essential components",File.join( "provision", "prepare.sh" ),"")
+  vagrant_copy_run(config, "Setting up essential components", File.join( "provision", "prepare.sh" ),"")
   
   if File.exists?(File.join('provision','provision-pre.sh')) then
-    vagrant_copy_run(config, "Running the pre-hook to the default provisioning script",File.join("provision","provision-pre.sh"),"")
+    vagrant_copy_run(config, "Running the pre-hook to the default provisioning script", File.join("provision","provision-pre.sh"),"")
   end
 
-  vagrant_copy_run(config,"Setting up the desktop environment",File.join( "env", "#{settings['desktop']}.bash"),"")
+  vagrant_copy_run(config,"Setting up the desktop environment", File.join( "env", "#{settings['desktop']}.bash"),"")
 
   if File.exists?(File.join('provision','provision.sh')) then
-    vagrant_copy_run(config, "Setting up environment specific properties",File.join("provision","provision.sh"),"")
+    vagrant_copy_run(config, "Setting up environment specific properties", File.join("provision","provision.sh"),"")
   end
 
   if File.exists?(File.join('provision','provision-post.sh')) then
-    vagrant_copy_run(config, "Running the post-hook to the default provisioning script",File.join("provision","provision-post.sh"),"")
+    vagrant_copy_run(config, "Running the post-hook to the default provisioning script", File.join("provision","provision-post.sh"),"")
   end
 end

@@ -6,7 +6,8 @@ require 'getoptlong'
 # ---------------------------------------
 
 ##
-# Print the required usage of vagrant up
+# Print the required usage of vagrant
+#
 def print_usage()
     puts 'vagrant [options] <command>'
     puts
