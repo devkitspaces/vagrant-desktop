@@ -48,5 +48,3 @@ _site/*
 *.yml
 *.yaml
 *.log
-# Documentation:
-docs/**/images/
