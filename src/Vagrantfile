@@ -10,7 +10,7 @@ require 'time'
 # ---------------------------------------
 if !Vagrant.has_plugin?('vagrant-vbguest')
   puts 'vagrant-vbguest plugin required. To install simply do `vagrant plugin install vagrant-vbguest`'
-  exit
+  exit 1
 end
 
 # ---------------------------------------

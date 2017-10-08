@@ -90,6 +90,6 @@ def vm_run_with_dot(name, file, dotfile_path)
     
         system "vagrant --name=#{name} --file=#{file} " + ARGV.join(' ')
         ENV['VAGRANT_DOTFILE_PATH'] = nil
-        exit
+        exit 1
     end
 end

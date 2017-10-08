@@ -20,7 +20,7 @@ def read_settings(file)
     if !File.file?(file)
         puts "open #{file}: The system cannot find the file specified."
         puts "  path: #{file}"
-        exit
+        exit 1
     end
 
     settings = YAML.load_file(file)
@@ -52,7 +52,7 @@ def validate_settings(settings)
 
     if err
         puts "The settings file has errors. Please fix and try to provision again."
-        exit
+        exit 1
     end
 end
 

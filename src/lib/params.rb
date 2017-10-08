@@ -81,6 +81,6 @@ def require_arg(name, value)
         puts "Missing argument: The '--#{name}' argument is required."
         puts 
         print_usage()
-        exit
+        exit 1
     end
 end
