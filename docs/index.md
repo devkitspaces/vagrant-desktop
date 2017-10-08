@@ -1,16 +1,15 @@
 # 
 <h1 align="center">
-    <img alt="Vagrant Desktop" src="https://gitlab.com/jrbeverly/vagrant-desktop/raw/docs/icon/icon.png" width="200px" height="200px" />
+    <img alt="Vagrant Desktop" src="/docs/icon/icon.png" width="200px" height="200px" />
     <br /> Vagrant Desktop
 </h1>
 
 <p align="center">
     Vagrant Desktop provides a method of reproducible graphical development environments
 </p>
-
 <div align="center">
     <a href="https://gitlab.com/jrbeverly/vagrant-desktop/commits/master"><img alt="pipeline status" src="https://gitlab.com/jrbeverly/vagrant-desktop/badges/master/pipeline.svg" /></a>
-    <a href="https://gitlab.com/jrbeverly/vagrant-desktop/blob/master/LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
+    <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
     <a href="https://gitlab.com/jrbeverly/vagrant-desktop"><img alt="repository" src="https://img.shields.io/badge/gitlab-githooks-red.svg" /></a>
 </div>
 <br />
