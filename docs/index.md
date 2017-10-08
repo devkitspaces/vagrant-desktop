@@ -16,10 +16,6 @@
 
 ---
 
- * [Summary](#summary)
- * [Components](#components)
- * [Development](#development)
-
 ## Summary
 
 Provide a method of reproducible graphical development environments based on Linux.  This repository provides a base Linux Desktop environment, sandboxed on your local computer.  

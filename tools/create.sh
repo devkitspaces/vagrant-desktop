@@ -8,7 +8,7 @@ set -e
 # Variables
 # 
 DIR=$(dirname "$(readlink -f "$0")")
-DIR_ROOT="$(dirname $DIR)"
+DIR_ROOT="$(dirname "$DIR")"
 DIR_SRC="$DIR_ROOT/src"
 
 #
@@ -48,15 +48,22 @@ fi
 #
 # Vagrant
 #
+filepath="$(cd "$(dirname '$file')" &>/dev/null && printf "%s/%s" "$PWD" "${file##*/}")"
 cd $DIR_SRC
 
 echo "Preparing the environment, this will take a while."
-vagrant --name=$name --file=$file up
-#sleep 10
 
-#echo "Restarting the newly created environment."
-#vagrant halt
-#sleep 5
+echo "vagrant --name='$name' --file='$filepath' up"
+vagrant --name="$name" --file="$filepath" up
+echo "Preparing to halt the environment."
 
-#echo "The environment is ready!"
-#vagrant up
+sleep 5
+
+echo "Preparing to restart the newly created environment."
+vagrant --name="$name" --file="$filepath" halt
+echo "Restarting the newly created environment."
+
+sleep 5
+
+echo "The environment is ready!"
+vagrant --name="$name" --file="$filepath" up

@@ -1,5 +1,3 @@
-# Vagrant Linux Desktop
-
 ## Summary
 
 Provide a method of reproducible graphical development environments based on Linux.  This repository provides a base Linux Desktop environment, sandboxed on your local computer.  
@@ -9,7 +7,7 @@ Provide a method of reproducible graphical development environments based on Lin
 You can use this locally with `vagrant up`, calling as such:
 
 ```
-vagrant --name=mydesktop up
+vagrant --name=mydesktop --file=desktop.yaml up
 ```
 
 However It is recommended to use the script `create.sh` for the first run to ensure all necessary arguments are provided. The provided arguments creates a `settings.yaml`, storing the settings for the machine.  You can create the machine by calling:
@@ -86,7 +84,3 @@ The following are the dependencies of the vagrant project
 
 * `getoptlong` - The [GetoptLong](http://ruby-doc.org/stdlib-2.1.0/libdoc/getoptlong/rdoc/GetoptLong.html) class allows you to parse command line options similarly to the GNU getopt_long() C library call.
 * `yaml` - The [YAML](https://ruby-doc.org/stdlib-1.9.3/libdoc/yaml/rdoc/YAML.html) module provides a Ruby interface for data serialization in YAML format.
-
-## Acknowledgements
-
-The project icon is by [Maxi Koichi from the Noun Project](docs/icon/README.md).
