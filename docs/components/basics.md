@@ -1,22 +1,3 @@
-# 
-<h1 align="center">
-    <img alt="Vagrant Desktop" src="https://gitlab.com/jrbeverly/vagrant-desktop/raw/docs/icon/icon.png" width="200px" height="200px" />
-    <br /> Vagrant Desktop
-</h1>
-
-<p align="center">
-    Vagrant Desktop provides a method of reproducible graphical development environments
-</p>
-
-<div align="center">
-    <a href="https://gitlab.com/jrbeverly/vagrant-desktop/commits/master"><img alt="pipeline status" src="https://gitlab.com/jrbeverly/vagrant-desktop/badges/master/pipeline.svg" /></a>
-    <a href="https://gitlab.com/jrbeverly/vagrant-desktop/blob/master/LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
-    <a href="https://gitlab.com/jrbeverly/vagrant-desktop"><img alt="repository" src="https://img.shields.io/badge/gitlab-githooks-red.svg" /></a>
-</div>
-<br />
-
----
-
 ## Summary
 
 Provide a method of reproducible graphical development environments based on Linux.  This repository provides a base Linux Desktop environment, sandboxed on your local computer.  
@@ -103,7 +84,3 @@ The following are the dependencies of the vagrant project
 
 * `getoptlong` - The [GetoptLong](http://ruby-doc.org/stdlib-2.1.0/libdoc/getoptlong/rdoc/GetoptLong.html) class allows you to parse command line options similarly to the GNU getopt_long() C library call.
 * `yaml` - The [YAML](https://ruby-doc.org/stdlib-1.9.3/libdoc/yaml/rdoc/YAML.html) module provides a Ruby interface for data serialization in YAML format.
-
-## Acknowledgements
-
-The project icon is by [Maxi Koichi from the Noun Project](docs/icon/README.md).

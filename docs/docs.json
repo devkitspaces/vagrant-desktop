@@ -1,0 +1,28 @@
+{
+    "name": "Vagrant Desktop",
+    "description": "Vagrant Desktop provides a method of reproducible graphical development environments",
+    "icon": {
+        "url": "https://gitlab.com/jrbeverly/vagrant-desktop/raw/docs/icon/icon.png"
+    },
+    "pipeline": {
+        "url": "https://gitlab.com/jrbeverly/vagrant-desktop/commits/master",
+        "badge": "https://gitlab.com/jrbeverly/vagrant-desktop/badges/master/pipeline.svg"
+    },
+    "repository": {
+        "url": "https://gitlab.com/jrbeverly/vagrant-desktop",
+        "badge": "https://img.shields.io/badge/gitlab-githooks-red.svg"
+    },
+    "license": {
+        "url": "LICENSE",
+        "badge": "https://img.shields.io/badge/license-MIT-blue.svg"
+    },
+    "badges": [{
+        "link": "https://gitlab.com/jrbeverly/vagrant-desktop",
+        "alt": "vagrant version",
+        "badge": "https://img.shields.io/badge/gitlab-githooks-red.svg"
+    }],
+    "files": [
+        "components/basics.md",
+        "components/icon.md"
+    ]
+}
