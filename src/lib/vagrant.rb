@@ -47,6 +47,21 @@ def vm_synced_folders(config, settings)
 end
 
 ##
+# Sets a series of scripts to run.
+# Params:
+# +config+:: The vagrant configuration
+# +settings+:: A list of scripts
+#
+def vm_run_scripts(config, scripts)
+    scripts && synced_folders.each do |script|
+        config.vm.provision :shell do |sh|
+            sh.path = synced_folder['path']
+            sh.env = { }
+        end
+    end
+end
+
+##
 # Sets a series of environment variables based on the settings file
 # Params:
 # +config+:: The vagrant configuration
