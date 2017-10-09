@@ -38,6 +38,11 @@ end
 def validate_settings(settings)
     err=false
 
+    if settings.nil? || !settings
+        puts "The settings file is empty or corrupted. Please fix and try to provision again."
+        exit 1
+    end
+
     err = !has_property(settings, 'name') \
         | !has_property(settings, 'box') \
         | !has_property(settings, 'path') \
@@ -45,7 +50,7 @@ def validate_settings(settings)
         | !has_property(settings, 'synced_folders') \
         | !has_property(settings, 'logs')
 
-    if ! File.exists?(File.join('env',"#{settings['desktop']}.bash")) then
+    if has_property(settings, 'desktop') and ! File.exists?(File.join('env',"#{settings['desktop']}.bash")) then
         puts "The environment '#{settings['desktop']}' could not be found."
         err = true
     end

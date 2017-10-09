@@ -13,6 +13,7 @@ else
 fi
 
 echo "Writing provision logs $VAGRANT_LOG."
+echo "Provisioning enviroment" >$VAGRANT_LOG
 
 apt-get update >>$VAGRANT_LOG 2>&1
 apt-get install -y boxes >>$VAGRANT_LOG 2>&1

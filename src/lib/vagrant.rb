@@ -40,6 +40,8 @@ end
 # +settings+:: The settings object
 #
 def vm_synced_folders(config, settings)
+    config.vm.synced_folder "../", "/opt/vagrant/"
+
     synced_folders = settings['synced_folders']
     synced_folders && synced_folders.each do |synced_folder|
         config.vm.synced_folder synced_folder['host'], synced_folder['guest']
@@ -53,9 +55,9 @@ end
 # +settings+:: A list of scripts
 #
 def vm_run_scripts(config, scripts)
-    scripts && synced_folders.each do |script|
+    scripts && scripts.each do |script|
         config.vm.provision :shell do |sh|
-            sh.path = synced_folder['path']
+            sh.path = script
             sh.env = { }
         end
     end
@@ -76,12 +78,14 @@ def vm_variables(config, settings)
         profile.puts "echo \"export #{var['name']}='#{var['value']}'\" >> /etc/profile.d/vagrant.sh"
     end
 
-    log_dir = settings['logs']
+    log_dir = File.expand_path(settings['logs'])
+    puts "Setting the log directory to the path:"
+    puts "      #{log_dir}"
+
     logfile = "provision-#{Time.now.strftime('%Y-%m-%d_%H-%M-%S')}.log"  
     FileUtils.mkdir_p(log_dir) unless File.directory?(log_dir)
-
-    log_path = File.join(log_dir, logfile)
-    profile.puts "echo \"export VAGRANT_LOG='/opt/vagrant/#{log_path}'\" >> /etc/profile.d/vagrant.sh"
+    
+    profile.puts "echo \"export VAGRANT_LOG='/opt/vagrant/#{logfile}'\" >> /etc/profile.d/vagrant.sh"
 
     profile.puts "chmod +x /etc/profile.d/vagrant.sh"
     
@@ -101,7 +105,7 @@ end
 def vm_run_with_dot(name, file, dotfile_path)
     if(ENV['VAGRANT_DOTFILE_PATH'].nil? && '.vagrant' != dotfile_path)
         ENV['VAGRANT_DOTFILE_PATH'] = dotfile_path
-        FileUtils.rm_r('.vagrant')
+        FileUtils.rmdir('.vagrant')
     
         system "vagrant --name=#{name} --file=#{file} " + ARGV.join(' ')
         ENV['VAGRANT_DOTFILE_PATH'] = nil

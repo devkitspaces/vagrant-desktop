@@ -103,15 +103,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   if File.exists?(File.join('provision','provision-pre.sh')) then
     vagrant_copy_run(config, "Running the pre-hook to the default provisioning script", File.join("provision","provision-pre.sh"),"")
   end
-  vm_run_scripts(config, settings['pre-hooks'])
+  vm_run_scripts(config, settings['pre-hook'])
 
   vagrant_copy_run(config,"Setting up the desktop environment", File.join( "env", "#{settings['desktop']}.bash"),"")
-
-  if File.exists?(settings['provision']) then
+  if !settings['provision'].nil? and File.exists?(settings['provision']) then
     vagrant_copy_run(config, "Setting up environment specific properties", settings['provision'],"")
   end
 
-  vm_run_scripts(config, settings['post-hooks'])
+  vm_run_scripts(config, settings['post-hook'])  
   if File.exists?(File.join('provision','provision-post.sh')) then
     vagrant_copy_run(config, "Running the post-hook to the default provisioning script", File.join("provision","provision-post.sh"),"")
   end
