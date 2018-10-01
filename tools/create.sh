@@ -57,13 +57,13 @@ echo "vagrant --name='$name' --file='$filepath' up"
 vagrant --name="$name" --file="$filepath" up
 echo "Preparing to halt the environment."
 
-sleep 5
+sleep 20
 
 echo "Preparing to restart the newly created environment."
-vagrant --name="$name" --file="$filepath" halt
+#vagrant --name="$name" --file="$filepath" halt
 echo "Restarting the newly created environment."
 
-sleep 5
+sleep 20
 
 echo "The environment is ready!"
 vagrant --name="$name" --file="$filepath" up

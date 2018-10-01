@@ -48,3 +48,7 @@ _site/*
 *.yml
 *.yaml
 *.log
+
+# Vagrant
+machines/
+.vagrant

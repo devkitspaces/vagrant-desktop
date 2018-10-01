@@ -1,24 +1,24 @@
-## Summary
+# Summary
 
 Provide a method of reproducible graphical development environments based on Linux.  This repository provides a base Linux Desktop environment, sandboxed on your local computer.  
 
-### Usage
+## Usage
 
 You can use this locally with `vagrant up`, calling as such:
 
-```
+```bash
 vagrant --name=mydesktop --file=desktop.yaml up
 ```
 
 However It is recommended to use the script `create.sh` for the first run to ensure all necessary arguments are provided. The provided arguments creates a `settings.yaml`, storing the settings for the machine.  You can create the machine by calling:
 
-```
+```bash
 sh create.sh -n mydesktop -d ubuntu
 ```
 
 If you want more information about the script `create.sh`, you can do so by calling:
 
-```
+```bash
 sh create.sh -h
 ```
 
@@ -41,19 +41,17 @@ On first run (`create.sh ...`) the base `bento/ubuntu` image will be downloaded,
 
 The `vagrant-desktop` is meant to be included as a git submodule as part of a `.Workspace` project.  The following is the architecture of a `.Workspace` meta-project:
 
-```
-* .Workspace Repository
-    * bin
-    * lib
-    * build
-        * build-all.sh
-    * Repositories
-        * MySourceCode (git repo submodule)
-        * MyLibCode (git repo submodule)
-    * Environments
-        * vagrant-desktop (git repo submodule)
-    README.md
-```
+    * .Workspace Repository
+        * bin
+        * lib
+        * build
+            * build-all.sh
+        * Repositories
+            * MySourceCode (git repo submodule)
+            * MyLibCode (git repo submodule)
+        * Environments
+            * vagrant-desktop (git repo submodule)
+        README.md
 
 The concept of this architecture is that the vagrant-desktop git repository can provision the desktop environment necessary for development.  From within the environment you can then edit the source code that is on the host system.
 
