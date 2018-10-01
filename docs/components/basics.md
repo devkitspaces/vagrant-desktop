@@ -1,6 +1,6 @@
 # Summary
 
-Provide a method of reproducible graphical development environments based on Linux.  This repository provides a base Linux Desktop environment, sandboxed on your local computer.  
+Provide a method of reproducible graphical development environments based on Linux. This repository provides a base Linux Desktop environment, sandboxed on your local computer.
 
 ## Usage
 
@@ -10,7 +10,7 @@ You can use this locally with `vagrant up`, calling as such:
 vagrant --name=mydesktop --file=desktop.yaml up
 ```
 
-However It is recommended to use the script `create.sh` for the first run to ensure all necessary arguments are provided. The provided arguments creates a `settings.yaml`, storing the settings for the machine.  You can create the machine by calling:
+However It is recommended to use the script `create.sh` for the first run to ensure all necessary arguments are provided. The provided arguments requires a `settings.yaml`, storing the settings for the machine. You can see an example of one in `tools/simple.yaml`. You can create the machine by calling:
 
 ```bash
 sh create.sh -n mydesktop -d ubuntu
@@ -24,22 +24,48 @@ sh create.sh -h
 
 ### Parameters
 
-The parameters are used in the calling of `vagrant up`, primarily as `vagrant [OPTIONS] up`.  After provisioning the environment, a settings file (`setting.yaml`) is created, which stores the provided parameters.
+The parameters are used in the calling of `vagrant up`, primarily as `vagrant [OPTIONS] up`. After provisioning the environment, a settings file (`setting.yaml`) is created, which stores the provided parameters.
 
 | Name | Type | Description |
-| ---  | ---  | ---         |
+| --- | --- | --- |
 | name | `string` | Name of the provisioned desktop environment |
-| desktop | `filename` | The name of the desktop provisioning script.  These scripts are present in [`packaging/environments`](src/packaging/environments). |
+| desktop | `filename` | The name of the desktop provisioning script. These scripts are present in [`packaging/environments`](src/packaging/environments). |
 
-The vagrant environment is based on the `bento/ubuntu` images.  If the timezone is not set, the provision script will attempt to auto-detect the timezone using [`tzupdate`](https://github.com/cdown/tzupdate).
+The vagrant environment is based on the `bento/ubuntu` images. If the timezone is not set, the provision script will attempt to auto-detect the timezone using [`tzupdate`](https://github.com/cdown/tzupdate).
+
+### Settings
+
+The following are arguments to the settings.yaml file:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| name | `string` | Name of the provisioned desktop environment |
+| box | `vagrant-box` | The name of the underlying vagrant box |
+| path | `dirname` | The path to the `.vagrant` directory |
+| desktop | `string` | The name of the desktop provisioning script |
+| logs | `dirname` | The directory to dump logs files  |
+| synced_folders | `(host: directory, guest: directory)[]` |  |
+
+An example yaml is included below:
+
+```yaml
+name: lab
+box: ubuntu/trusty64
+path: "."
+desktop: ubuntu-minimal
+logs: "log_dir"
+synced_folders:
+  - host: "../"
+    guest: "/media/vagrant"
+```
 
 ## Components
 
-On first run (`create.sh ...`) the base `bento/ubuntu` image will be downloaded, and the packages for a graphical interface will be downloaded. This will take a significant amount of time to fully setup to become fully installed.  The default user is `vagrant` with password `vagrant`.
+On first run (`create.sh ...`) the base `bento/ubuntu` (or image defined) image will be downloaded, and the packages for a graphical interface will be downloaded. This will take a significant amount of time to fully setup to become fully installed. The default user is `vagrant` with password `vagrant`.
 
 ### Architecture
 
-The `vagrant-desktop` is meant to be included as a git submodule as part of a `.Workspace` project.  The following is the architecture of a `.Workspace` meta-project:
+The `vagrant-desktop` is meant to be included as a git submodule as part of a `.Workspace` project. The following is the architecture of a `.Workspace` meta-project:
 
     * .Workspace Repository
         * bin
@@ -53,7 +79,7 @@ The `vagrant-desktop` is meant to be included as a git submodule as part of a `.
             * vagrant-desktop (git repo submodule)
         README.md
 
-The concept of this architecture is that the vagrant-desktop git repository can provision the desktop environment necessary for development.  From within the environment you can then edit the source code that is on the host system.
+The concept of this architecture is that the vagrant-desktop git repository can provision the desktop environment necessary for development. From within the environment you can then edit the source code that is on the host system.
 
 Essential tasks like pushing/pulling from the repository can be handled on the host machine to avoid having to copy secrets in the virtual machine.
 
@@ -61,14 +87,14 @@ Essential tasks like pushing/pulling from the repository can be handled on the h
 
 The `Vagrantfile` makes use of the following shared folders to access files on the host machine.
 
-| Name | Path |  Host Path (relative to `Vagrantfile`) | Description |
+| Name | Path | Host Path (relative to `Vagrantfile`) | Description |
 | --- | --- | --- | --- |
 | Repository | /srv/local | ../ | The `vagrant-desktop` repository root. |
 | Repositories | /home/vagrant/repositories | ../../../ | The parent directory of the `vagrant-desktop` repository. See [Architecture](#architecture). |
 
 ## Development
 
-The `Vagrantfile` is built to act as a bootstrap for more complex vagrant environments that provision a full development environment.  As such, it includes lines for script execution that can be leveraged downstream by other projects.  These scripts are expected within the `provision/` directory.
+The `Vagrantfile` is built to act as a bootstrap for more complex vagrant environments that provision a full development environment. As such, it includes lines for script execution that can be leveraged downstream by other projects. These scripts are expected within the `provision/` directory.
 
 | Script | Purpose |
 | --- | --- |
@@ -76,7 +102,7 @@ The `Vagrantfile` is built to act as a bootstrap for more complex vagrant enviro
 | provision.sh | provision.sh provisions the development environment. |
 | provision-post.sh | Acts as a post-hook to the provisioning. |
 
-### Dependencies 
+### Dependencies
 
 The following are the dependencies of the vagrant project
 
