@@ -46,7 +46,7 @@ The following are arguments to the settings.yaml file:
 | path | `dirname` | The path to the `.vagrant` directory |
 | desktop | `string` | The name of the desktop provisioning script |
 | logs | `dirname` | The directory to dump logs files  |
-| synced_folders | `(host: directory, guest: directory)[]` |  |
+| synced_folders | `(host: directory, guest: directory)[]` | A collection of syneced folders. |
 
 An example yaml is included below:
 
