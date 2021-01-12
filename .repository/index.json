@@ -1,0 +1,22 @@
+{
+  "slug": "vagrant-desktop",
+  "namespace": "jrbeverly",
+  "status": "archived",
+  "icon": "icon.svg",
+  "license": {
+    "type": "MIT",
+    "content": "Jonathan Beverly <jrbeverly>"
+  },
+  "topics": [
+    "vagrant",
+    "shell",
+    "virtualbox",
+    "graphical-interface",
+    "desktop-environment"
+  ],
+  "languages": [
+    "Dockerfile",
+    "Ruby",
+    "Shell"
+  ]
+}
