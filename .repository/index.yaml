@@ -1,0 +1,18 @@
+slug: vagrant-desktop
+description: This repository provides a base Linux Desktop environment, sandboxed on your local computer.
+project: devkitspaces
+namespace:
+status: archived
+icon: icon.svg
+license:
+  type: MIT
+  content: Jonathan Beverly <jrbeverly>
+  year: 2017
+topics: |-
+  [
+    "vagrant",
+    "shell",
+    "virtualbox",
+    "graphical-interface",
+    "desktop-environment"
+  ]
